@@ -18,27 +18,6 @@ class IndexHandler(web.RequestHandler):
         with open('index.html') as ff:
             self.write(ff.read())
 
-def pose_to_cmd(i, label):
-    p = i['pose']['pose']['position']
-    p['z'] = 0
-    q = i['pose']['pose']['orientation']
-    return {'type': 'axes', 'position': p, 'orientation': q, 'label': str(label), 'size': 0.25}
-
-
-def send_test_data(client):
-    with open('/home/jari/Dropbox/simbe_notebooks/mpslam-testing/tarjan_office.json') as ff:
-        scans = json.loads(ff.read())
-    running_scans = []
-    for ii, scan in enumerate(scans):
-        running_scans.append(scan)
-        running_scans = running_scans[-10:]
-        l2s = []
-        for jj, d in enumerate(running_scans):
-            l2s.append(pose_to_cmd(d['pose'], str(jj)))
-        client.write_message({'type': 'axes_list', 'elements': l2s})
-        time.sleep(0.01)
-
-
 class SocketHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
@@ -47,51 +26,100 @@ class SocketHandler(websocket.WebSocketHandler):
         with clients_lock:
             if self not in state['clients']:
                 state['clients'].append(self)
-                # send_test_data(self)
 
     def on_close(self):
         with clients_lock:
             if self in state['clients']:
-                state['clients'].cl.remove(self)
+                state['clients'].remove(self)
 
 
-def main():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+def main(loop):
+    with clients_lock:
+        asyncio.set_event_loop(loop)
 
-    app = web.Application(
-        [
-            ('/', IndexHandler),
-            ('/ws', SocketHandler),
-    #('/api', ApiHandler)
-        ],
-        debug=False)
-    app.listen(8888)
-    # signal.signal(signal.SIGINT, sig_handler)
-    print('starting')
+        app = web.Application(
+            [
+                ('/', IndexHandler),
+                ('/ws', SocketHandler),
+        #('/api', ApiHandler)
+            ],
+            debug=False)
+        app.listen(8888)
+        print('starting')
+
     ioloop.IOLoop.current().start()
 
 
 def send_command(cmd):
     if not send_command.thread:
-        send_command.thread = Thread(target=main)
+        send_command.loop = asyncio.new_event_loop()
+        send_command.thread = Thread(target=main, args=(send_command.loop,))
         send_command.thread.daemon = True
         send_command.thread.start()
-        time.sleep(2)
+
+        while True:
+            with clients_lock:
+                if len(state['clients']) > 0:
+                    break
+            time.sleep(0.2)
 
     with clients_lock:
         for client in state['clients']:
+            # print('sending to client')
             client.write_message(cmd)
 
 send_command.thread = None
 
-# if __name__ == '__main__':
-#     main()
+
+def pose_to_cmd(i, label):
+    p = i['pose']['pose']['position']
+    p['z'] = 0
+    q = i['pose']['pose']['orientation']
+    return {'type': 'axes', 'position': p, 'orientation': q, 'label': str(label), 'size': 0.25}
+
+
+import numpy as np
+def project_laser(msg, xx, yy, rr):
+    ranges = np.array(msg['ranges'], 'float32')[::-1]
+    ranges = np.nan_to_num(ranges)
+    ranges[np.abs(ranges) > 15] = 0
+    angle_min = msg['angle_min']
+    angle_max = msg['angle_max']
+    angles = np.linspace(angle_min, angle_max, len(ranges))
+    _x = ranges * np.cos(angles)
+    _y = ranges * np.sin(angles)
+    x, y, r = xx, yy, rr
+    xvals = x + _x * np.cos(r) - _y * np.sin(r)
+    yvals = y + _y * np.cos(r) + _x * np.sin(r)
+    return {'x': list(xvals), 'y': list(yvals), 'z': list(xvals*0)}
+
+
+def scan_to_cmd(i, label):
+    return {'type': 'pointcloud', 'label': str(label), 'arrs': project_laser(i, 0, 0, 0)}
+
+
+def send_test_data():
+    with open('/home/jari/Dropbox/simbe_notebooks/mpslam-testing/tarjan_office.json') as ff:
+        scans = json.loads(ff.read())
+    l2s = []
+    # for jj, d in enumerate(scans[::20]):
+    #     l2s.append(pose_to_cmd(d['pose'], str(jj)))
+    # send_command({'type': 'axes_list', 'elements': l2s})
+    for jj, d in enumerate(scans[::20]):
+        p = pose_to_cmd(d['pose'], 'cloud_center')
+        send_command(p)
+        c = scan_to_cmd(d['scan'], f'cloud{jj}')
+        # c = scan_to_cmd(d['scan'], f'cloud')
+        c['position'] = p['position']
+        c['orientation'] = p['orientation']
+        send_command(c)
+        # if jj > 100:
+        #     return
+        time.sleep(0.01)
+
 
 if __name__ == '__main__':
-    t = Thread(target=main)
-    t.daemon = True
-    t.start()
-    while True:
-        print('running')
-        time.sleep(1)
+    try:
+        send_test_data()
+    except KeyboardInterrupt:
+        send_command.loop.stop()

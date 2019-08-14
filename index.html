@@ -25,23 +25,33 @@
 
 		    <script>
 
+         function startWebsocket() {
+             var ws = new WebSocket('ws://localhost:8888/ws')
+
+             ws.onclose = function(){
+                 ws = null
+                 setTimeout(startWebsocket, 1250)
+             }
+
+
+             ws.onmessage = function(ev){
+                 data = JSON.parse(ev.data);
+                 if (data.type == "axes") {
+                     add_axes(scn, data.size, data.label, data.position, data.orientation);
+                 } else if (data.type == "axes_list") {
+                     for (var i = 0; i < data.elements.length; i++) {
+                         var el = data.elements[i];
+                         add_axes(scn, el.size, el.label, el.position, el.orientation);
+                     }
+                 } else if (data.type == "pointcloud") {
+                     add_pointcloud(scn, data.label, data.arrs, data.position, data.orientation);
+                 }
+             };
+
+         }
+
 
          var host = window.location.host;
-         /* var ws = new WebSocket('ws://'+host+'/ws'); */
-         var ws = new WebSocket('ws://localhost:8888/ws');
-
-         ws.onopen = function(){
-             console.log("websocket opened");
-         };
-
-         ws.onclose = function(ev){
-             console.log(ev);
-             console.log("websocket closed");
-         };
-
-         ws.onerror = function(ev){
-             console.log("websocket errored");
-         };
 
          var scn = make_scene(window)
 
@@ -58,18 +68,7 @@
 				     render_scene(scn);
          }
 
-         ws.onmessage = function(ev){
-             data = JSON.parse(ev.data);
-             if (data.type == "axes") {
-                 add_axes(scn, data.size, data.label, data.position, data.orientation);
-             }
-             else if (data.type == "axes_list") {
-                 for (var i = 0; i < data.elements.length; i++) {
-                     var el = data.elements[i];
-                     add_axes(scn, el.size, el.label, el.position, el.orientation);
-                 }
-             }
-         };
+         startWebsocket();
 
          animate();
 
