@@ -95,26 +95,29 @@ def project_laser(msg, xx, yy, rr):
 
 
 def scan_to_cmd(i, label):
-    return {'type': 'pointcloud', 'label': str(label), 'arrs': project_laser(i, 0, 0, 0)}
+    return {'type': 'pointcloud', 'label': str(label), 'arrs': project_laser(i, 0, 0, 0), 'opacity': 1.0, 'color': '#ff0000'}
 
 
 def send_test_data():
     with open('/home/jari/Dropbox/simbe_notebooks/mpslam-testing/tarjan_office.json') as ff:
         scans = json.loads(ff.read())
     l2s = []
-    # for jj, d in enumerate(scans[::20]):
-    #     l2s.append(pose_to_cmd(d['pose'], str(jj)))
-    # send_command({'type': 'axes_list', 'elements': l2s})
-    for jj, d in enumerate(scans[::20]):
+    last = None
+    for jj, d in enumerate(scans[::10]):
         p = pose_to_cmd(d['pose'], 'cloud_center')
         send_command(p)
         c = scan_to_cmd(d['scan'], f'cloud{jj}')
-        # c = scan_to_cmd(d['scan'], f'cloud')
         c['position'] = p['position']
         c['orientation'] = p['orientation']
+        l2s.append(c)
+
+        if last:
+            last['opacity'] = 0.1
+            last['color'] = '#000000'
+            send_command(last)
+
         send_command(c)
-        # if jj > 100:
-        #     return
+        last = c
         time.sleep(0.01)
 
 

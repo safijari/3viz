@@ -3,7 +3,7 @@ function make_scene(window) {
 		_scene.background = new THREE.Color( 0xf0f0f0 );
 		var _camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
     set_up(_camera);
-		var _renderer = new THREE.WebGLRenderer(antialias=true);
+		var _renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
 		_renderer.setSize( window.innerWidth, window.innerHeight );
 
     var _controls = new THREE.OrbitControls( _camera, _renderer.domElement );
@@ -82,10 +82,18 @@ function _set_position_orientation_if_provided(obj, position, orientation) {
     }
 }
 
-function add_pointcloud(scn, label, arrs, position=null, orientation=null) {
+function _default(val, def) {
+    if (val == null) {
+        return def;
+    } else {
+        return val;
+    }
+}
+
+function add_pointcloud(scn, label, arrs, position=null, orientation=null, color=null, opacity=null) {
     var obj = null;
     if (!scn.objects_map.hasOwnProperty(label)) {
-        var mat = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1});
+        var mat = new THREE.PointsMaterial({ color: new THREE.Color(_default(color, "#ff0000")), size: 0.05, transparent: true, opacity: _default(opacity, 1.0)});
         var geom = new THREE.Geometry();
         geom.dynamic = true;
         obj = new THREE.Points(geom, mat);
@@ -97,16 +105,28 @@ function add_pointcloud(scn, label, arrs, position=null, orientation=null) {
         obj = scn.objects_map[label];
     }
 
-    // for (var i = 0; i < obj.geometry.vertices.length; i++) {
-    //     obj.geometry.vertices.pop();
-    // }
     obj.geometry.vertices = [];
 
     for (var i = 0; i < arrs.x.length; i++) {
         obj.geometry.vertices.push(new THREE.Vector3(arrs.x[i], arrs.y[i], arrs.z[i]));
     }
 
+    if (color != null) {
+        obj.material.color = new THREE.Color(color);
+        obj.material.colorNeedsUpdate = true;
+    }
+
+    if (opacity != null) {
+        obj.material.opacity = opacity;
+        obj.material.opacityNeedsUpdate = true;
+    }
+
     obj.geometry.verticesNeedUpdate = true;
 
     _set_position_orientation_if_provided(obj, position, orientation);
+}
+
+function _snapshot(scn) {
+    var strMime = "image/png";
+    return scn.renderer.domElement.toDataURL(strMime);
 }
