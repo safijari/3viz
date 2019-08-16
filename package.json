@@ -1,0 +1,24 @@
+{
+  "name": "3viz",
+  "version": "1.0.0",
+  "description": "Gee whiz it's 3viz",
+  "main": "helpers.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimbeRobotics/3viz.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SimbeRobotics/3viz/issues"
+  },
+  "homepage": "https://github.com/SimbeRobotics/3viz#readme",
+  "dependencies": {
+    "@types/three": "^0.103.2",
+    "three": "^0.107.0",
+    "three-orbitcontrols-ts": "^0.1.2"
+  }
+}
