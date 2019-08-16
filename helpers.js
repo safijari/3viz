@@ -93,7 +93,7 @@ function _default(val, def) {
 function add_pointcloud(scn, label, arrs, position=null, orientation=null, color=null, opacity=null) {
     var obj = null;
     if (!scn.objects_map.hasOwnProperty(label)) {
-        var mat = new THREE.PointsMaterial({ color: new THREE.Color(_default(color, "#ff0000")), size: 0.05, transparent: true, opacity: _default(opacity, 1.0)});
+        var mat = new THREE.PointsMaterial({ color: new THREE.Color(_default(color, "#ff0000")), size: 0.01, transparent: true, opacity: _default(opacity, 1.0)});
         var geom = new THREE.Geometry();
         geom.dynamic = true;
         obj = new THREE.Points(geom, mat);
@@ -105,11 +105,20 @@ function add_pointcloud(scn, label, arrs, position=null, orientation=null, color
         obj = scn.objects_map[label];
     }
 
-    obj.geometry.vertices = [];
-
-    for (var i = 0; i < arrs.x.length; i++) {
-        obj.geometry.vertices.push(new THREE.Vector3(arrs.x[i], arrs.y[i], arrs.z[i]));
+    if (obj.geometry.vertices.length == arrs.x.length) {
+        for (var i = 0; i < arrs.x.length; i++) {
+            var v = obj.geometry.vertices[i];
+            v.x = arrs.x[i];
+            v.y = arrs.y[i];
+            v.z = arrs.z[i];
+        }
+    } else {
+        obj.geometry.vertices = [];
+        for (var i = 0; i < arrs.x.length; i++) {
+            obj.geometry.vertices.push(new THREE.Vector3(arrs.x[i], arrs.y[i], arrs.z[i]));
+        }
     }
+
 
     if (color != null) {
         obj.material.color = new THREE.Color(color);

@@ -1,12 +1,12 @@
-from tornado.log import enable_pretty_logging
-enable_pretty_logging()
+import signal
 
 from tornado import websocket, web, ioloop
 from threading import Thread, Lock
-import signal
 import time
 import asyncio
-import json
+
+from tornado.log import enable_pretty_logging
+enable_pretty_logging()
 
 clients_lock = Lock()
 
@@ -17,6 +17,7 @@ class IndexHandler(web.RequestHandler):
     def get(self):
         with open('index.html') as ff:
             self.write(ff.read())
+
 
 class SocketHandler(websocket.WebSocketHandler):
     def check_origin(self, origin):
@@ -44,7 +45,7 @@ def main(loop):
         #('/api', ApiHandler)
             ],
             debug=False)
-        app.listen(8888)
+        app.listen(8765)
         print('starting')
 
     ioloop.IOLoop.current().start()
@@ -53,7 +54,7 @@ def main(loop):
 def send_command(cmd):
     if not send_command.thread:
         send_command.loop = asyncio.new_event_loop()
-        send_command.thread = Thread(target=main, args=(send_command.loop,))
+        send_command.thread = Thread(target=main, args=(send_command.loop, ))
         send_command.thread.daemon = True
         send_command.thread.start()
 
@@ -63,66 +64,22 @@ def send_command(cmd):
                     break
             time.sleep(0.2)
 
+        time.sleep(0.25)
+
     with clients_lock:
         for client in state['clients']:
             # print('sending to client')
             client.write_message(cmd)
 
+
+def sig_handler(sig, frame):
+    try:
+        send_command.loop.stop()
+    except Exception:
+        pass
+
+
 send_command.thread = None
 
-
-def pose_to_cmd(i, label):
-    p = i['pose']['pose']['position']
-    p['z'] = 0
-    q = i['pose']['pose']['orientation']
-    return {'type': 'axes', 'position': p, 'orientation': q, 'label': str(label), 'size': 0.25}
-
-
-import numpy as np
-def project_laser(msg, xx, yy, rr):
-    ranges = np.array(msg['ranges'], 'float32')[::-1]
-    ranges = np.nan_to_num(ranges)
-    ranges[np.abs(ranges) > 15] = 0
-    angle_min = msg['angle_min']
-    angle_max = msg['angle_max']
-    angles = np.linspace(angle_min, angle_max, len(ranges))
-    _x = ranges * np.cos(angles)
-    _y = ranges * np.sin(angles)
-    x, y, r = xx, yy, rr
-    xvals = x + _x * np.cos(r) - _y * np.sin(r)
-    yvals = y + _y * np.cos(r) + _x * np.sin(r)
-    return {'x': list(xvals), 'y': list(yvals), 'z': list(xvals*0)}
-
-
-def scan_to_cmd(i, label):
-    return {'type': 'pointcloud', 'label': str(label), 'arrs': project_laser(i, 0, 0, 0), 'opacity': 1.0, 'color': '#ff0000'}
-
-
-def send_test_data():
-    with open('/home/jari/Dropbox/simbe_notebooks/mpslam-testing/tarjan_office.json') as ff:
-        scans = json.loads(ff.read())
-    l2s = []
-    last = None
-    for jj, d in enumerate(scans[::10]):
-        p = pose_to_cmd(d['pose'], 'cloud_center')
-        send_command(p)
-        c = scan_to_cmd(d['scan'], f'cloud{jj}')
-        c['position'] = p['position']
-        c['orientation'] = p['orientation']
-        l2s.append(c)
-
-        if last:
-            last['opacity'] = 0.1
-            last['color'] = '#000000'
-            send_command(last)
-
-        send_command(c)
-        last = c
-        time.sleep(0.01)
-
-
-if __name__ == '__main__':
-    try:
-        send_test_data()
-    except KeyboardInterrupt:
-        send_command.loop.stop()
+# assumes we started from a main thread
+signal.signal(signal.SIGINT, sig_handler)
