@@ -20,5 +20,24 @@
     "@types/three": "^0.103.2",
     "three": "^0.107.0",
     "three-orbitcontrols-ts": "^0.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --inline --open"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "latest",
+    "browser-sync": "latest",
+    "browser-sync-webpack-plugin": "latest",
+    "css-loader": "latest",
+    "extract-text-webpack-plugin": "latest",
+    "html-webpack-plugin": "latest",
+    "json-loader": "latest",
+    "progress-bar-webpack-plugin": "latest",
+    "style-loader": "latest",
+    "typescript": "latest",
+    "webpack": "latest",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "latest"
   }
 }

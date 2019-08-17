@@ -1,4 +1,5 @@
-import * as tj from 'three'
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 interface Position {
     x: number,
@@ -13,41 +14,55 @@ interface Orientation {
     w?: number
 }
 
-class ThreeViz {
-    scene: tj.Scene = new tj.Scene()
-    renderer: tj.Renderer = new tj.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
-    grid: tj.GridHelper = new tj.GridHelper(10, 10)
+export class ThreeViz {
+    scene: THREE.Scene = new THREE.Scene()
+    renderer: THREE.Renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
+    grid: THREE.GridHelper = new THREE.GridHelper(10, 10)
 
-    camera: tj.PerspectiveCamera
-    objects: Record<string, tj.Object3D> = {}
+    camera: THREE.PerspectiveCamera
+    controls: OrbitControls
+    objects: Record<string, THREE.Object3D> = {}
 
-    constructor(fov: number, ratio: number) {
-        this.camera = new tj.PerspectiveCamera(fov, ratio, 0.1, 1000);
-        this.scene.background = new tj.Color(0xf0f0f0)
+    constructor(fov: number, width: number, height: number) {
+        this.camera = new THREE.PerspectiveCamera(fov, width/height, 0.1, 1000);
+        this.camera.isPerspectiveCamera = true;
+        this.scene.background = new THREE.Color(0xf0f0f0)
+
+		    this.renderer.setSize( width, height );
 
         this.set_up(this.camera)
         this.set_up(this.grid)
+
+        this.set_orientation(this.grid, THREE.Math.degToRad(90), 0, 0)
+
+        this.scene.add(this.grid)
+
+        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+        this.camera.position.x = 5
+        this.camera.position.y = 5
+        this.camera.position.z = 5
+        this.camera.lookAt(0, 0, 0)
     }
 
     render() { this.renderer.render(this.scene, this.camera) }
 
-    set_up(obj: tj.Object3D) { obj.up = new tj.Vector3(0, 0, 1) }
+    set_up(obj: THREE.Object3D) { obj.up = new THREE.Vector3(0, 0, 1) }
 
-    set_orientation(obj: tj.Object3D, x: number, y: number, z: number, w: number | null = null) {
+    set_orientation(obj: THREE.Object3D, x: number, y: number, z: number, w: number | null = null) {
         if (w != null) {
-            obj.setRotationFromQuaternion(new tj.Quaternion(x, y, z, w))
+            obj.setRotationFromQuaternion(new THREE.Quaternion(x, y, z, w))
         } else {
-            obj.setRotationFromEuler(new tj.Euler(x, y, z))
+            obj.setRotationFromEuler(new THREE.Euler(x, y, z))
         }
     }
 
-    set_position(obj: tj.Object3D, x: number, y: number, z: number) {
-        obj.position = new tj.Vector3(x, y, z)
+    set_position(obj: THREE.Object3D, x: number, y: number, z: number) {
+        obj.position = new THREE.Vector3(x, y, z)
     }
 
-    set_scale(obj: tj.Object3D, x: number, y: number, z: number) { obj.scale = new tj.Vector3(x, y, z) }
+    set_scale(obj: THREE.Object3D, x: number, y: number, z: number) { obj.scale = new THREE.Vector3(x, y, z) }
 
-    _set_position_orientation_if_provided(obj: tj.Object3D, position: Position | null, orientation: Orientation | null) {
+    _set_position_orientation_if_provided(obj: THREE.Object3D, position: Position | null, orientation: Orientation | null) {
         let p = position
         if (p != null) {
             this.set_position(obj, p.x, p.y, p.z)
