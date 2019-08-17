@@ -126,7 +126,6 @@ def send_test_data():
 
         send_command(c)
         last = c
-        time.sleep(0.01)
 
 
 def depth_projection(im, fx, fy, cx, cy):
@@ -147,8 +146,8 @@ def depth_projection(im, fx, fy, cx, cy):
 
 if __name__ == '__main__':
     try:
-        # send_test_pointclouds()
         send_test_data()
+        # send_test_pointclouds()
         time.sleep(5)
     except KeyboardInterrupt:
         send_command.loop.stop()

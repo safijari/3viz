@@ -21,24 +21,24 @@ interface PointArrays {
     z: number[],
 }
 
-interface BaseAction {
+export interface BaseAction {
     kind: string,
     label: string,
     position?: Position,
     orientation?: Orientation
 }
 
-interface AxesAction extends BaseAction {
+export interface AxesAction extends BaseAction {
     size?: number
 }
 
-interface PointCloudAction extends BaseAction {
+export interface PointCloudAction extends BaseAction {
     color?: string,
     opacity?: number,
     point_size?: number
 }
 
-type Action = AxesAction | PointCloudAction
+export type Action = AxesAction | PointCloudAction
 
 type ObjectT = THREE.AxesHelper | THREE.Points | THREE.Line | THREE.Line3
 
@@ -114,7 +114,7 @@ export class ThreeViz {
     }
 
     set_position(obj: THREE.Object3D, x: number, y: number, z: number) {
-        this._apply_xyz(obj.position, z, y, z)
+        this._apply_xyz(obj.position, x, y, z)
     }
 
     set_scale(obj: THREE.Object3D, x: number, y: number, z: number) {
@@ -180,10 +180,12 @@ export class ThreeViz {
             }
         } else {
             geom.vertices = []
-            for (let idx in geom.vertices) {
+            for (let idx in p.x) {
                 geom.vertices.push(new THREE.Vector3(p.x[idx], p.y[idx], p.z[idx]))
             }
         }
+
+        geom.verticesNeedUpdate = true;
 
         let mat = (<THREE.PointsMaterial>this._get_first_mat(obj))
         mat.color = new THREE.Color(color)
