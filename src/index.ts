@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 let scn = new ThreeViz(75, window.innerWidth, window.innerHeight)
 
-console.log(scn.camera instanceof THREE.PerspectiveCamera)
+console.log(scn)
 
 // add axis to the scene
 let axis = new THREE.AxesHelper(10)
