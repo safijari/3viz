@@ -104,17 +104,16 @@ def send_test_data():
 
     l2s = []
     last = None
-    for jj, d in enumerate(scans[::20]):
+    for jj, d in enumerate(scans[::5]):
 
         x, y, t = pose_from_data(d)
         scan = d['scan']
 
         mpm.process_scan(scan, x, y, t)
 
-        # p = pose_to_cmd(d['pose'], 'cloud_center')
         p = pose2d_to_cmd(mpm.recent_scans[-1].corrected_pose, 'cloud_center')
         send_command(p)
-        c = scan_to_cmd(d['scan'], f'cloud{jj}')
+        c = scan_to_cmd(d['scan'], 'cloud')
         c['position'] = p['position']
         c['orientation'] = p['orientation']
         l2s.append(c)
@@ -126,6 +125,7 @@ def send_test_data():
 
         send_command(c)
         last = c
+        time.sleep(0.01)
 
 
 def depth_projection(im, fx, fy, cx, cy):

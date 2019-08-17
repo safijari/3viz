@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { Object3D } from 'three';
 
 interface Position {
     x: number,
@@ -40,7 +39,7 @@ export interface PointCloudAction extends BaseAction {
 
 export type Action = AxesAction | PointCloudAction
 
-type ObjectT = THREE.AxesHelper | THREE.Points | THREE.Line | THREE.Line3
+// type ObjectT = THREE.AxesHelper | THREE.Points | THREE.Line | THREE.Line3
 
 interface HasMaterial {
     material: THREE.Material | THREE.Material[]

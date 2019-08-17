@@ -4,6 +4,7 @@ from tornado import websocket, web, ioloop
 from threading import Thread, Lock
 import time
 import asyncio
+import msgpack
 
 from tornado.log import enable_pretty_logging
 enable_pretty_logging()
@@ -68,8 +69,8 @@ def send_command(cmd):
 
     with clients_lock:
         for client in state['clients']:
-            # print('sending to client')
-            client.write_message(cmd)
+            print("writing")
+            client.write_message(msgpack.packb(cmd), binary=True)
 
 
 def sig_handler(sig, frame):

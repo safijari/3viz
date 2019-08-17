@@ -4,7 +4,8 @@
   "description": "Gee whiz it's 3viz",
   "main": "helpers.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --inline --open"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,9 @@
   "homepage": "https://github.com/SimbeRobotics/3viz#readme",
   "dependencies": {
     "@types/three": "^0.103.2",
+    "messagepack": "^1.1.10",
     "three": "^0.107.0",
     "three-orbitcontrols-ts": "^0.1.2"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --inline --open"
   },
   "devDependencies": {
     "awesome-typescript-loader": "latest",
