@@ -50,7 +50,8 @@ def project_laser(msg, xx, yy, rr):
     x, y, r = xx, yy, rr
     xvals = x + _x * np.cos(r) - _y * np.sin(r)
     yvals = y + _y * np.cos(r) + _x * np.sin(r)
-    return {'x': list(xvals[ranges > 0]), 'y': list(yvals[ranges > 0]), 'z': list(xvals[ranges > 0] * 0)}
+    # return {'x': list(xvals[ranges > 0]), 'y': list(yvals[ranges > 0]), 'z': list(xvals[ranges > 0] * 0)}
+    return list(np.vstack((xvals, yvals, xvals*0)).T.flatten())
 
 
 def scan_to_cmd(i, label):
@@ -58,8 +59,9 @@ def scan_to_cmd(i, label):
         'type': 'pointcloud',
         'label': str(label),
         'arrs': project_laser(i, 0, 0, 0),
-        'opacity': 1.0,
-        'color': '#ff0000'
+        'opacity': 0.5,
+        'color': '#000000',
+        'size': 0.1
     }
 
 
@@ -113,15 +115,16 @@ def send_test_data():
 
         p = pose2d_to_cmd(mpm.recent_scans[-1].corrected_pose, 'cloud_center')
         send_command(p)
+        # c = scan_to_cmd(d['scan'], 'cloud'+str(jj))
         c = scan_to_cmd(d['scan'], 'cloud')
         c['position'] = p['position']
         c['orientation'] = p['orientation']
         l2s.append(c)
 
-        if last:
-            last['opacity'] = 0.1
-            last['color'] = '#000000'
-            send_command(last)
+        # if last:
+        #     last['opacity'] = 0.1
+        #     last['color'] = '#000000'
+        #     send_command(last)
 
         send_command(c)
         last = c

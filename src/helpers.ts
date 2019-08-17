@@ -153,38 +153,32 @@ export class ThreeViz {
         this.scene.add(obj)
     }
 
-    add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", point_arrays: PointArrays, opacity: number = 1.0, point_size: number = 0.1) {
+    add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", point_arrays: number[], opacity: number = 1.0, point_size: number = 0.1) {
         let obj: THREE.Points;
+        let added = false
         if (label in this.objects) {
             obj = <THREE.Points>this.objects[label]
         } else {
             let mat = new THREE.PointsMaterial({ color: new THREE.Color(color), size: point_size,
                                                  transparent: true, opacity: opacity})
-            let geom = new THREE.Geometry()
+            let geom = new THREE.BufferGeometry()
+            geom.addAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
 
             obj = new THREE.Points(geom, mat)
             this._add_obj(obj, label)
+            added = true
         }
 
-        let geom = (<THREE.Geometry>obj.geometry);
+        if (!added) {
+            let geom = (<THREE.BufferGeometry>obj.geometry);
 
-        let p = point_arrays
+            geom.attributes.position.array = new Float32Array(point_arrays);
+            (<THREE.BufferAttribute>geom.attributes.position).needsUpdate = true
 
-        if (geom.vertices.length == point_arrays.x.length) {
-            for (let idx in geom.vertices) {
-                let v = geom.vertices[idx];
-                v.x = p.x[idx]
-                v.y = p.y[idx]
-                v.z = p.z[idx]
-            }
-        } else {
-            geom.vertices = []
-            for (let idx in p.x) {
-                geom.vertices.push(new THREE.Vector3(p.x[idx], p.y[idx], p.z[idx]))
-            }
+            geom.computeBoundingSphere();
+
         }
 
-        geom.verticesNeedUpdate = true;
 
         let mat = (<THREE.PointsMaterial>this._get_first_mat(obj))
         mat.color = new THREE.Color(color)
