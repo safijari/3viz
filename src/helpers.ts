@@ -144,7 +144,7 @@ export class ThreeViz {
         this.set_scale(axes, size, size, size)
         this._set_position_orientation_if_provided(axes, position, orientation)
 
-        this.render()
+        // this.render()
     }
 
     _add_obj(obj: THREE.Object3D, label: string) {
@@ -186,37 +186,30 @@ export class ThreeViz {
 
         this._set_position_orientation_if_provided(obj, position, orientation)
 
-        this.render()
+        // this.render()
     }
 
-    add_line(label: string, pos_arrays: Position[], color: string = "#000000", thickness: number = 0.1, opacity: number = 1.0) {
+    add_line(label: string, point_arrays: number[], color: string = "#000000", thickness: number = 0.1, opacity: number = 1.0) {
         let obj: THREE.Line;
         if (label in this.objects) {
             obj = <THREE.Line>this.objects[label]
-        } else {
-            let mat = new THREE.LineBasicMaterial({ color: new THREE.Color(color), linewidth: thickness,
-                                                 transparent: true, opacity: opacity})
-            let geom = new THREE.Geometry()
-
-            obj = new THREE.Line(geom, mat)
-            this._add_obj(obj, label)
+            this.scene.remove(obj);
         }
 
-        let geom = <THREE.Geometry>obj.geometry;
+        let mat = new THREE.LineBasicMaterial({ color: new THREE.Color(color), linewidth: thickness,
+                                                transparent: true, opacity: opacity})
 
-        geom.vertices = []
+        let geom = new THREE.BufferGeometry()
+        geom.addAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
 
-        for (let pos of pos_arrays) {
-            geom.vertices.push(pos as THREE.Vector3);
-        }
-        geom.computeBoundingSphere();
-        geom.verticesNeedUpdate = true;
+        obj = new THREE.Line(geom, mat)
+        this._add_obj(obj, label)
 
-        let mat = (<THREE.LineBasicMaterial>this._get_first_mat(obj));
-        mat.color = new THREE.Color(color);
-        mat.opacity = opacity;
+        // let mat = (<THREE.LineBasicMaterial>this._get_first_mat(obj));
+        // mat.color = new THREE.Color(color);
+        // mat.opacity = opacity;
 
-        this.render()
+        // this.render()
     }
 
     _snapshot() {

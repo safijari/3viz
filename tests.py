@@ -111,19 +111,21 @@ def send_test_data():
     mpm = MPScanMatcher(0.00436332309619, -2.35619449615, 2.35619449615)
 
     l2s = []
-    last = None
 
     line_points = []
+    line_points_flat = []
 
-    for jj, d in enumerate(scans[::30]):
+    for jj, d in enumerate(scans[::150]):
 
         x, y, t = pose_from_data(d)
         scan = d['scan']
 
         mpm.process_scan(scan, x, y, t)
 
-        p = pose2d_to_cmd(mpm.recent_scans[-1].corrected_pose, 'cloud_center')
+        _p = mpm.recent_scans[-1].corrected_pose
+        p = pose2d_to_cmd(mpm.recent_scans[-1].corrected_pose, 'cloud_center' + str(jj))
         line_points.append(p['position'])
+        line_points_flat.extend([_p.x, _p.y, 0])
 
         send_command(p)
         # c = scan_to_cmd(d['scan'], 'cloud'+str(jj))
@@ -136,10 +138,10 @@ def send_test_data():
         #     last['color'] = '#000000'
         #     send_command(last)
 
-        if len(line_points) > 1:
-            send_command(points_to_line_cmd(line_points, 'linee'))
+        # if len(line_points) > 1:
+            # send_command(points_to_line_cmd(line_points, 'linee'))
+        send_command({'label': 'linee', 'type': 'line', 'positions': line_points_flat})
         send_command(c)
-        last = c
         time.sleep(0.01)
 
 

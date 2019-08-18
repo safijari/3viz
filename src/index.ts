@@ -43,9 +43,12 @@ let axis = new THREE.AxesHelper(10)
 
 document.body.appendChild(scn.renderer.domElement)
 
-function animate(): void {
-    requestAnimationFrame(animate)
-    scn.render()
+function animate() {
+    setTimeout( function() {
+        requestAnimationFrame( animate );
+    }, 1000 / 30 );
+    scn.render();
 }
+
 startWebsocket()
 animate()
