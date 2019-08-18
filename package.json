@@ -1,0 +1,41 @@
+{
+  "name": "3viz",
+  "version": "1.0.0",
+  "description": "Gee whiz it's 3viz",
+  "main": "helpers.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --inline --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimbeRobotics/3viz.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SimbeRobotics/3viz/issues"
+  },
+  "homepage": "https://github.com/SimbeRobotics/3viz#readme",
+  "dependencies": {
+    "@types/three": "^0.103.2",
+    "messagepack": "^1.1.10",
+    "three": "^0.107.0",
+    "three-orbitcontrols-ts": "^0.1.2"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "latest",
+    "browser-sync": "latest",
+    "browser-sync-webpack-plugin": "latest",
+    "css-loader": "latest",
+    "extract-text-webpack-plugin": "latest",
+    "html-webpack-plugin": "latest",
+    "json-loader": "latest",
+    "progress-bar-webpack-plugin": "latest",
+    "style-loader": "latest",
+    "typescript": "latest",
+    "webpack": "latest",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "latest"
+  }
+}

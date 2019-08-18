@@ -36,6 +36,12 @@ def pose2d_to_cmd(i, label):
     }
 
 
+def points_to_line_cmd(points, label):
+    return {
+        'type': 'line',
+        'positions': points,
+        'label': str(label),
+    }
 
 
 def project_laser(msg, xx, yy, rr):
@@ -50,7 +56,8 @@ def project_laser(msg, xx, yy, rr):
     x, y, r = xx, yy, rr
     xvals = x + _x * np.cos(r) - _y * np.sin(r)
     yvals = y + _y * np.cos(r) + _x * np.sin(r)
-    return {'x': list(xvals[ranges > 0]), 'y': list(yvals[ranges > 0]), 'z': list(xvals[ranges > 0] * 0)}
+    # return {'x': list(xvals[ranges > 0]), 'y': list(yvals[ranges > 0]), 'z': list(xvals[ranges > 0] * 0)}
+    return list(np.vstack((xvals, yvals, xvals*0)).T.flatten())
 
 
 def scan_to_cmd(i, label):
@@ -58,8 +65,9 @@ def scan_to_cmd(i, label):
         'type': 'pointcloud',
         'label': str(label),
         'arrs': project_laser(i, 0, 0, 0),
-        'opacity': 1.0,
-        'color': '#ff0000'
+        'opacity': 0.5,
+        'color': '#000000',
+        'size': 0.1
     }
 
 
@@ -103,29 +111,37 @@ def send_test_data():
     mpm = MPScanMatcher(0.00436332309619, -2.35619449615, 2.35619449615)
 
     l2s = []
-    last = None
-    for jj, d in enumerate(scans[::20]):
+
+    line_points = []
+    line_points_flat = []
+
+    for jj, d in enumerate(scans[::150]):
 
         x, y, t = pose_from_data(d)
         scan = d['scan']
 
         mpm.process_scan(scan, x, y, t)
 
-        # p = pose_to_cmd(d['pose'], 'cloud_center')
-        p = pose2d_to_cmd(mpm.recent_scans[-1].corrected_pose, 'cloud_center')
+        _p = mpm.recent_scans[-1].corrected_pose
+        p = pose2d_to_cmd(mpm.recent_scans[-1].corrected_pose, 'cloud_center' + str(jj))
+        line_points.append(p['position'])
+        line_points_flat.extend([_p.x, _p.y, 0])
+
         send_command(p)
-        c = scan_to_cmd(d['scan'], f'cloud{jj}')
+        # c = scan_to_cmd(d['scan'], 'cloud'+str(jj))
+        c = scan_to_cmd(d['scan'], 'cloud')
         c['position'] = p['position']
         c['orientation'] = p['orientation']
         l2s.append(c)
 
-        if last:
-            last['opacity'] = 0.1
-            last['color'] = '#000000'
-            send_command(last)
+        #     last['opacity'] = 0.1
+        #     last['color'] = '#000000'
+        #     send_command(last)
 
+        # if len(line_points) > 1:
+            # send_command(points_to_line_cmd(line_points, 'linee'))
+        send_command({'label': 'linee', 'type': 'line', 'positions': line_points_flat})
         send_command(c)
-        last = c
         time.sleep(0.01)
 
 
@@ -147,8 +163,8 @@ def depth_projection(im, fx, fy, cx, cy):
 
 if __name__ == '__main__':
     try:
-        # send_test_pointclouds()
         send_test_data()
+        # send_test_pointclouds()
         time.sleep(5)
     except KeyboardInterrupt:
         send_command.loop.stop()
