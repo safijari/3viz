@@ -36,6 +36,12 @@ def pose2d_to_cmd(i, label):
     }
 
 
+def points_to_line_cmd(points, label):
+    return {
+        'type': 'line',
+        'positions': points,
+        'label': str(label),
+    }
 
 
 def project_laser(msg, xx, yy, rr):
@@ -106,7 +112,10 @@ def send_test_data():
 
     l2s = []
     last = None
-    for jj, d in enumerate(scans[::5]):
+
+    line_points = []
+
+    for jj, d in enumerate(scans[::30]):
 
         x, y, t = pose_from_data(d)
         scan = d['scan']
@@ -114,6 +123,8 @@ def send_test_data():
         mpm.process_scan(scan, x, y, t)
 
         p = pose2d_to_cmd(mpm.recent_scans[-1].corrected_pose, 'cloud_center')
+        line_points.append(p['position'])
+
         send_command(p)
         # c = scan_to_cmd(d['scan'], 'cloud'+str(jj))
         c = scan_to_cmd(d['scan'], 'cloud')
@@ -121,11 +132,12 @@ def send_test_data():
         c['orientation'] = p['orientation']
         l2s.append(c)
 
-        # if last:
         #     last['opacity'] = 0.1
         #     last['color'] = '#000000'
         #     send_command(last)
 
+        if len(line_points) > 1:
+            send_command(points_to_line_cmd(line_points, 'linee'))
         send_command(c)
         last = c
         time.sleep(0.01)

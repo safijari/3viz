@@ -185,5 +185,42 @@ export class ThreeViz {
         mat.opacity = opacity
 
         this._set_position_orientation_if_provided(obj, position, orientation)
+
+        this.render()
+    }
+
+    add_line(label: string, pos_arrays: Position[], color: string = "#000000", thickness: number = 0.1, opacity: number = 1.0) {
+        let obj: THREE.Line;
+        if (label in this.objects) {
+            obj = <THREE.Line>this.objects[label]
+        } else {
+            let mat = new THREE.LineBasicMaterial({ color: new THREE.Color(color), linewidth: thickness,
+                                                 transparent: true, opacity: opacity})
+            let geom = new THREE.Geometry()
+
+            obj = new THREE.Line(geom, mat)
+            this._add_obj(obj, label)
+        }
+
+        let geom = <THREE.Geometry>obj.geometry;
+
+        geom.vertices = []
+
+        for (let pos of pos_arrays) {
+            geom.vertices.push(pos as THREE.Vector3);
+        }
+        geom.computeBoundingSphere();
+        geom.verticesNeedUpdate = true;
+
+        let mat = (<THREE.LineBasicMaterial>this._get_first_mat(obj));
+        mat.color = new THREE.Color(color);
+        mat.opacity = opacity;
+
+        this.render()
+    }
+
+    _snapshot() {
+        let strMime = "image/png";
+        return this.renderer.domElement.toDataURL(strMime);
     }
 }
