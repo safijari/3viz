@@ -69,7 +69,7 @@ def send_command(cmd):
 
     with clients_lock:
         for client in state['clients']:
-            print("writing")
+            # print("writing")
             client.write_message(msgpack.packb(cmd), binary=True)
 
 
