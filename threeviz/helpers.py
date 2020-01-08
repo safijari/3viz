@@ -63,6 +63,15 @@ def scan_to_cmd(i, label):
         'size': 0.1
     }
 
+def pointcloud_cmd(x, y, z, label, color='red', opacity=0.5, size=0.1):
+    return {
+        'type': 'pointcloud',
+        'label': str(label),
+        'arrs': np.vstack((x, y, z)).T.flatten().tolist(),
+        'opacity': opacity,
+        'color': color,
+        'size': size
+    }
 
 
 def pose_from_data(d):

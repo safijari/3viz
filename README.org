@@ -1,0 +1,3 @@
+* Where it stands as of [2020-01-07 Tue 2:14pm]
+  - Need to do npm install on the 3viz folder
+  - Then npm start

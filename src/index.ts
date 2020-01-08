@@ -46,7 +46,7 @@ document.body.appendChild(scn.renderer.domElement)
 function animate() {
     setTimeout( function() {
         requestAnimationFrame( animate );
-    }, 1000 / 30 );
+    }, 1000 / 60 );
     scn.render();
 }
 
