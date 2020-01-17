@@ -9,8 +9,7 @@ def pose_to_cmd(i, label):
     return {'type': 'axes', 'position': p, 'orientation': q, 'label': str(label), 'size': 0.25}
 
 
-def pose2d_to_cmd(i, label):
-    t = Transform.from_pose2d(i)
+def transform_to_cmd(t, label, size=0.25):
     return {
         'type': 'axes',
         'position': {
@@ -25,15 +24,24 @@ def pose2d_to_cmd(i, label):
             'w': t.qw
         },
         'label': str(label),
-        'size': 0.25
+        'size': size
     }
 
 
-def points_to_line_cmd(points, label):
+def pose2d_to_cmd(i, label, size=0.25):
+    t = Transform.from_pose2d(i)
+    return transform_to_cmd(t, label, size)
+
+
+    # send_command(points_to_line_cmd([x1, y1, z1, x2, y2, z2], label, color, opacity, size))
+def points_to_line_cmd(points, label, color, opacity, size):
     return {
         'type': 'line',
         'positions': points,
         'label': str(label),
+        'color': color,
+        'opacity': opacity,
+        'size': size
     }
 
 
