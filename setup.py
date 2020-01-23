@@ -2,6 +2,6 @@ from setuptools import setup, find_packages
 
 setup(
     name='3viz',
-    version="0.0.1-dev",
+    version="0.0.1",
     packages=find_packages(),
-    install_requires=[])
+    install_requires=['tornado', 'numpy', 'tiny_tf', 'msgpack'])

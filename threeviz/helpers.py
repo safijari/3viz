@@ -2,6 +2,7 @@ import numpy as np
 from tiny_tf.tf import Transform
 from tiny_tf.transformations import euler_from_quaternion
 
+
 def pose_to_cmd(i, label):
     p = i['pose']['pose']['position']
     p['z'] = 0
@@ -33,7 +34,6 @@ def pose2d_to_cmd(i, label, size=0.25):
     return transform_to_cmd(t, label, size)
 
 
-    # send_command(points_to_line_cmd([x1, y1, z1, x2, y2, z2], label, color, opacity, size))
 def points_to_line_cmd(points, label, color, opacity, size):
     return {
         'type': 'line',

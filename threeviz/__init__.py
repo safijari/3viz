@@ -3,7 +3,7 @@ import signal
 from tornado import websocket, web, ioloop
 from threading import Thread, Lock
 import time
-import asyncio
+# import asyncio
 import msgpack
 
 from tornado.log import enable_pretty_logging
@@ -37,8 +37,7 @@ class SocketHandler(websocket.WebSocketHandler):
 
 def main(loop):
     with clients_lock:
-        asyncio.set_event_loop(loop)
-
+        # asyncio.set_event_loop(loop)
         app = web.Application(
             [
                 ('/', IndexHandler),
@@ -54,7 +53,8 @@ def main(loop):
 
 def send_command(cmd):
     if not send_command.thread:
-        send_command.loop = asyncio.new_event_loop()
+        # send_command.loop = asyncio.new_event_loop()
+        send_command.loop = ioloop.IOLoop.instance()
         send_command.thread = Thread(target=main, args=(send_command.loop, ))
         send_command.thread.daemon = True
         send_command.thread.start()
@@ -82,5 +82,4 @@ def sig_handler(sig, frame):
 
 send_command.thread = None
 
-# assumes we started from a main thread
 signal.signal(signal.SIGINT, sig_handler)
