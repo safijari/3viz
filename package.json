@@ -18,10 +18,9 @@
   },
   "homepage": "https://github.com/SimbeRobotics/3viz#readme",
   "dependencies": {
-    "@types/three": "^0.103.2",
-    "messagepack": "^1.1.10",
-    "three": "^0.107.0",
-    "three-orbitcontrols-ts": "^0.1.2"
+    "messagepack": "latest",
+    "three": "latest",
+    "three-orbitcontrols-ts": "latest"
   },
   "devDependencies": {
     "awesome-typescript-loader": "latest",
@@ -35,7 +34,7 @@
     "style-loader": "latest",
     "typescript": "latest",
     "webpack": "latest",
-    "webpack-cli": "^3.0.8",
+    "webpack-cli": "latest",
     "webpack-dev-server": "latest"
   }
 }
