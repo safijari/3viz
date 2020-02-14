@@ -4,11 +4,20 @@ import { encode, decode } from 'messagepack';
 
 let scn = new ThreeViz(75, window.innerWidth, window.innerHeight)
 
+const queryString = window.location.search;
+console.log(queryString)
+const urlParams = new URLSearchParams(queryString);
+
+let port = urlParams.get('port')
+if (port == null) {
+    port = '8765'
+}
+
 
 function startWebsocket() {
     let ws: WebSocket | null
 
-    ws = new WebSocket('ws://localhost:8765/ws')
+    ws = new WebSocket('ws://localhost:'+port+'/ws')
 
     ws.onclose = function(){
         ws = null
