@@ -3,6 +3,7 @@ import signal
 from tornado import websocket, web, ioloop
 from threading import Thread, Lock
 import time
+import os
 try:
     import asyncio
     aio = True
@@ -41,6 +42,14 @@ class SocketHandler(websocket.WebSocketHandler):
 
 
 def main(loop):
+    port = 8765
+    if 'THREEVIZ_PORT' in os.environ:
+        try:
+            port = int(os.environ['THREEVIZ_PORT'])
+            print(f"Setting threeviz port to user supplied {port}")
+            print("Please ensure the client uses the same port.")
+        except Exception:
+            print(f"{os.environ['THREEVIZ_PORT']} is not a valid port.")
     with clients_lock:
         if aio:
             asyncio.set_event_loop(loop)
