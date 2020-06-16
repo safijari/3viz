@@ -46,10 +46,11 @@ def main(loop):
     if 'THREEVIZ_PORT' in os.environ:
         try:
             port = int(os.environ['THREEVIZ_PORT'])
-            print(f"Setting threeviz port to user supplied {port}")
-            print("Please ensure the client uses the same port.")
+            # print(f"Setting threeviz port to user supplied {port}")
+            # print("Please ensure the client uses the same port.")
         except Exception:
-            print(f"{os.environ['THREEVIZ_PORT']} is not a valid port.")
+            # print(f"{os.environ['THREEVIZ_PORT']} is not a valid port.")
+            print('shit')
     with clients_lock:
         if aio:
             asyncio.set_event_loop(loop)
@@ -86,7 +87,7 @@ def send_command(cmd):
 
     with clients_lock:
         for client in state['clients']:
-            client.write_message(msgpack.packb(cmd), binary=True)
+            client.write_message(msgpack.packb(cmd, use_bin_type=False), binary=True)
 
 
 def sig_handler(sig, frame):
