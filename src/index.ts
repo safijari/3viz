@@ -37,6 +37,8 @@ function startWebsocket() {
                     }
                 } else if (data.type == "pointcloud") {
                     scn.add_pointcloud(data.label, data.position, data.orientation, data.color, data.arrs, data.opacity, data.size);
+                } else if (data.type == "cubecloud") {
+                    scn.add_cube_cloud(data.label, data.position, data.orientation, data.color, data.xarr, data.yarr, data.zarr, data.opacity, data.size);
                 } else if (data.type == "line") {
                     scn.add_line(data.label, data.positions, data.color, data.thickness, data.opacity);
                 }

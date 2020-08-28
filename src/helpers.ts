@@ -154,9 +154,26 @@ export class ThreeViz {
         this.scene.add(obj)
     }
 
+    add_cube_cloud(label: string, position: Position | null, orientation:Orientation | null, color: string = "#ff0000", xarr: number[], yarr: number[], zarr: number[], opacity: number = 1.0, point_size: number = 0.1) {
+        let geometry = new THREE.BoxBufferGeometry(point_size, point_size, point_size)
+        var wireframe = new THREE.WireframeGeometry( geometry );
+        let material = new THREE.MeshBasicMaterial({color: color, transparent:true, opacity:opacity})
+
+        var group = new THREE.Group()
+
+        for (var i = 0; i < xarr.length; i++) {
+            var cube = new THREE.Mesh(geometry, material)
+            cube.position.set(xarr[i], yarr[i], zarr[i])
+            group.add(cube)
+        }
+
+        this._add_obj(group, label)
+
+        this._set_position_orientation_if_provided(group, position, orientation)
+    }
+
     add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", point_arrays: number[], opacity: number = 1.0, point_size: number = 0.1) {
         let obj: THREE.Points;
-        let added = false
 
         if (label in this.objects) {
             obj = <THREE.Points>this.objects[label]
