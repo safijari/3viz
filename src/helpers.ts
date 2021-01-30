@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as dat from 'dat.gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 interface Position {
@@ -47,7 +48,8 @@ interface HasMaterial {
 
 export class ThreeViz {
     scene: THREE.Scene = new THREE.Scene()
-    // renderer: THREE.Renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
+    ray_caster: THREE.Raycaster = new THREE.Raycaster()
+    gui: dat.GUI = new dat.GUI({ autoPlace: true })
     renderer: THREE.Renderer = new THREE.WebGLRenderer()
     grid: THREE.GridHelper = new THREE.GridHelper(10, 10)
 
@@ -55,9 +57,10 @@ export class ThreeViz {
     controls: OrbitControls
     objects: Record<string, THREE.Object3D>
 
+    settings = { fov: 75, status: "none", default_cam: () => { this.set_default_position(); } };
+
     constructor(fov: number, width: number, height: number) {
         this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);
-        // this.camera.isPerspectiveCamera = true;
         this.scene.background = new THREE.Color(0xf0f0f0)
         this.objects = {}
 
@@ -76,12 +79,46 @@ export class ThreeViz {
         gridmat.transparent = true;
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.camera.position.x = 5
-        this.camera.position.y = 5
-        this.camera.position.z = 5
-        this.camera.lookAt(0, 0, 0)
+        this.set_default_position();
+        this.reload_camera_posision();
+
+        this.controls.addEventListener("change", () => { sessionStorage.setItem("camera_position", JSON.stringify(this.camera.position)); sessionStorage.setItem("camera_quat", JSON.stringify(this.camera.quaternion)) });
 
         this.add_axes('root', null, null, 0.25)
+
+        this.gui.add(this.settings, "status");
+        this.gui.add(this.settings, "fov", 50, 100).onChange((v) => { this.camera.fov = v; this.camera.updateProjectionMatrix(); });
+        this.gui.add(this.settings, "default_cam");
+    }
+
+    set_default_position() {
+        console.log("setting default cam position");
+        this.camera.position.x = 5;
+        this.camera.position.y = 5;
+        this.camera.position.z = 5;
+        this.camera.lookAt(0, 0, 0);
+        this.camera.updateProjectionMatrix();
+    }
+
+    reload_camera_posision() {
+        var pos_str = sessionStorage.getItem("camera_position");
+        if (pos_str == null) {
+            return
+        }
+        var pos = JSON.parse(pos_str);
+        this.camera.position.x = pos.x;
+        this.camera.position.y = pos.y;
+        this.camera.position.z = pos.z;
+
+        var pos_str = sessionStorage.getItem("camera_quat");
+        if (pos_str == null) {
+            return
+        }
+        var pos = JSON.parse(pos_str);
+        this.camera.quaternion.x = pos._x;
+        this.camera.quaternion.y = pos._y;
+        this.camera.quaternion.z = pos._z;
+        this.camera.quaternion.w = pos._w;
     }
 
     update_size(width: number, height: number) {

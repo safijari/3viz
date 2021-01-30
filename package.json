@@ -5,9 +5,9 @@
   "main": "helpers.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "webpack serve",
-      "build": "webpack build -o deploy/threeviz/",
-      "clean": "rm -r dist"
+    "start": "webpack serve",
+    "build": "webpack build -o deploy/threeviz/",
+    "clean": "rm -r dist"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/SimbeRobotics/3viz#readme",
   "dependencies": {
+    "@types/dat.gui": "^0.7.6",
+    "dat.gui": "^0.7.7",
     "messagepack": "latest",
     "three": "latest",
     "three-orbitcontrols-ts": "latest"
