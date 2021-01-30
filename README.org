@@ -1,3 +1,4 @@
 * Where it stands as of [2020-01-07 Tue 2:14pm]
+  - nvm, node 10.5 at least
   - Need to do npm install on the 3viz folder
   - Then npm start
