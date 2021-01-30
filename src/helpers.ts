@@ -57,7 +57,7 @@ export class ThreeViz {
 
     constructor(fov: number, width: number, height: number) {
         this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);
-        this.camera.isPerspectiveCamera = true;
+        // this.camera.isPerspectiveCamera = true;
         this.scene.background = new THREE.Color(0xf0f0f0)
         this.objects = {}
 
@@ -66,7 +66,7 @@ export class ThreeViz {
         this.set_up(this.camera)
         this.set_up(this.grid)
 
-        this.set_orientation(this.grid, THREE.Math.degToRad(90), 0, 0)
+        this.set_orientation(this.grid, THREE.MathUtils.degToRad(90), 0, 0)
 
         this.scene.add(this.grid)
 
