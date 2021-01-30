@@ -57,7 +57,7 @@ export class ThreeViz {
     controls: OrbitControls
     objects: Record<string, THREE.Object3D>
 
-    settings = { fov: 75, status: "none", default_cam: () => { this.set_default_position(); } };
+    settings = { fov: 75, status: "none", default_cam: () => { this.set_default_position(); }, clear_all: () => { this.clear_all_objects(); } };
 
     constructor(fov: number, width: number, height: number) {
         this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);
@@ -84,11 +84,12 @@ export class ThreeViz {
 
         this.controls.addEventListener("change", () => { sessionStorage.setItem("camera_position", JSON.stringify(this.camera.position)); sessionStorage.setItem("camera_quat", JSON.stringify(this.camera.quaternion)) });
 
-        this.add_axes('root', null, null, 0.25)
+        this.add_axes('root', null, null, 0.2)
 
         this.gui.add(this.settings, "status");
         this.gui.add(this.settings, "fov", 50, 100).onChange((v) => { this.camera.fov = v; this.camera.updateProjectionMatrix(); });
         this.gui.add(this.settings, "default_cam");
+        this.gui.add(this.settings, "clear_all");
     }
 
     set_default_position() {
@@ -187,8 +188,6 @@ export class ThreeViz {
 
         this.set_scale(axes, size, size, size)
         this._set_position_orientation_if_provided(axes, position, orientation)
-
-        // this.render()
     }
 
     _add_obj(obj: THREE.Object3D, label: string) {
@@ -213,6 +212,21 @@ export class ThreeViz {
         this._add_obj(group, label)
 
         this._set_position_orientation_if_provided(group, position, orientation)
+    }
+
+    delete_object(label: string) {
+        var obj = <THREE.Points>this.objects[label];
+        this.scene.remove(obj);
+        var geom = obj.geometry;
+        geom.dispose();
+        delete this.objects[label];
+    }
+
+    clear_all_objects() {
+        for (var label in this.objects) {
+            this.delete_object(label);
+        }
+        this.add_axes('root', null, null, 0.2)
     }
 
     add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", point_arrays: number[], opacity: number = 1.0, point_size: number = 0.1) {

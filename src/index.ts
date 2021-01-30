@@ -31,6 +31,12 @@ function startWebsocket() {
         ev.data.arrayBuffer().then(
             function(val: any) {
                 let data: any = decode(val);
+                if (data.type == "clear") {
+                    scn.clear_all_objects();
+                }
+                if (data.type == "delete") {
+                    scn.delete_object(data.label);
+                }
                 if (data.type == "axes") {
                     scn.add_axes(data.label, data.position, data.orientation, data.size);
                 } else if (data.type == "axes_list") {
