@@ -1,0 +1,3 @@
+[submodule "deploy/threeviz"]
+	path = deploy/threeviz
+	url = git@github.com:safijari/threeviz.git

@@ -2,7 +2,10 @@ import { ThreeViz } from './helpers';
 import * as THREE from 'three';
 import { encode, decode } from 'messagepack';
 
-let scn = new ThreeViz(75, window.innerWidth, window.innerHeight)
+let padding = 20;
+let winWidth = window.innerWidth;
+let winHeight = window.innerHeight;
+let scn = new ThreeViz(75, window.innerWidth - padding, window.innerHeight - padding)
 
 const queryString = window.location.search;
 console.log(queryString)
@@ -17,17 +20,17 @@ if (port == null) {
 function startWebsocket() {
     let ws: WebSocket | null
 
-    ws = new WebSocket('ws://localhost:'+port+'/ws')
+    ws = new WebSocket('ws://localhost:' + port + '/ws')
 
-    ws.onclose = function(){
+    ws.onclose = function() {
         ws = null
         setTimeout(startWebsocket, 1250)
     }
 
-    ws.onmessage = function(ev){
+    ws.onmessage = function(ev) {
         ev.data.arrayBuffer().then(
-            function (val: any) {
-                let data:any = decode(val);
+            function(val: any) {
+                let data: any = decode(val);
                 if (data.type == "axes") {
                     scn.add_axes(data.label, data.position, data.orientation, data.size);
                 } else if (data.type == "axes_list") {
@@ -55,10 +58,15 @@ let axis = new THREE.AxesHelper(10)
 document.body.appendChild(scn.renderer.domElement)
 
 function animate() {
-    setTimeout( function() {
-        requestAnimationFrame( animate );
-    }, 1000 / 60 );
+    setTimeout(function() {
+        requestAnimationFrame(animate);
+    }, 1000 / 60);
     scn.render();
+    if (winWidth != window.innerWidth || winHeight != window.innerHeight) {
+        winWidth = window.innerWidth;
+        winHeight = window.innerHeight;
+        scn.update_size(winWidth - padding, winHeight - padding);
+    }
 }
 
 startWebsocket()

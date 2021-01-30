@@ -84,6 +84,12 @@ export class ThreeViz {
         this.add_axes('root', null, null, 0.25)
     }
 
+    update_size(width: number, height: number) {
+        this.renderer.setSize(width, height);
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+    }
+
     render() { this.renderer.render(this.scene, this.camera) }
 
     set_up(obj: THREE.Object3D) { obj.up = new THREE.Vector3(0, 0, 1) }
@@ -154,10 +160,10 @@ export class ThreeViz {
         this.scene.add(obj)
     }
 
-    add_cube_cloud(label: string, position: Position | null, orientation:Orientation | null, color: string = "#ff0000", xarr: number[], yarr: number[], zarr: number[], opacity: number = 1.0, point_size: number = 0.1) {
+    add_cube_cloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", xarr: number[], yarr: number[], zarr: number[], opacity: number = 1.0, point_size: number = 0.1) {
         let geometry = new THREE.BoxBufferGeometry(point_size, point_size, point_size)
-        var wireframe = new THREE.WireframeGeometry( geometry );
-        let material = new THREE.MeshBasicMaterial({color: color, transparent:true, opacity:opacity})
+        var wireframe = new THREE.WireframeGeometry(geometry);
+        let material = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: opacity })
 
         var group = new THREE.Group()
 
@@ -182,8 +188,10 @@ export class ThreeViz {
             geom.dispose();
         }
 
-        let mat = new THREE.PointsMaterial({ color: new THREE.Color(color), size: point_size,
-                                                transparent: true, opacity: opacity})
+        let mat = new THREE.PointsMaterial({
+            color: new THREE.Color(color), size: point_size,
+            transparent: true, opacity: opacity
+        })
         let geom = new THREE.BufferGeometry()
         geom.addAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
 
@@ -218,8 +226,10 @@ export class ThreeViz {
             this.scene.remove(obj);
         }
 
-        let mat = new THREE.LineBasicMaterial({ color: new THREE.Color(color), linewidth: thickness,
-                                                transparent: true, opacity: opacity})
+        let mat = new THREE.LineBasicMaterial({
+            color: new THREE.Color(color), linewidth: thickness,
+            transparent: true, opacity: opacity
+        })
 
         let geom = new THREE.BufferGeometry()
         geom.addAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))

@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
       "start": "webpack serve",
-      "build": "webpack build",
-      "clean": "rm -r dist deploy"
+      "build": "webpack build -o deploy/threeviz/",
+      "clean": "rm -r dist"
   },
   "repository": {
     "type": "git",
