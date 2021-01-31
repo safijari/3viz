@@ -56,11 +56,18 @@ export class ThreeViz {
     camera: THREE.PerspectiveCamera
     controls: OrbitControls
     objects: Record<string, THREE.Object3D>
+    light: THREE.AmbientLight;
+
+    loader = new THREE.TextureLoader();
 
     settings = { fov: 75, status: "none", default_cam: () => { this.set_default_position(); }, clear_all: () => { this.clear_all_objects(); } };
 
     constructor(fov: number, width: number, height: number) {
         this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);
+        this.light = new THREE.AmbientLight(0x404040); // soft white light
+        this.light.intensity = 10;
+        this.scene.add(this.light);
+
         this.scene.background = new THREE.Color(0xf0f0f0)
         this.objects = {}
 
@@ -177,19 +184,6 @@ export class ThreeViz {
         }
     }
 
-    add_axes(label: string, position: Position | null, orientation: Orientation | null, size: number = 1.0) {
-        let axes;
-        if (label in this.objects) {
-            axes = this.objects[label];
-        } else {
-            axes = new THREE.AxesHelper(1)
-            this._add_obj(axes, label)
-        }
-
-        this.set_scale(axes, size, size, size)
-        this._set_position_orientation_if_provided(axes, position, orientation)
-    }
-
     _add_obj(obj: THREE.Object3D, label: string) {
         this.set_up(obj)
         this.objects[label] = obj
@@ -229,6 +223,55 @@ export class ThreeViz {
         this.add_axes('root', null, null, 0.2)
     }
 
+    add_axes(label: string, position: Position | null, orientation: Orientation | null, size: number = 1.0) {
+        let axes;
+        if (label in this.objects) {
+            axes = this.objects[label];
+        } else {
+            axes = new THREE.AxesHelper(1)
+            this._add_obj(axes, label)
+        }
+
+        this.set_scale(axes, size, size, size)
+        this._set_position_orientation_if_provided(axes, position, orientation)
+    }
+
+    add_plane_texture(label: string, texture_uri: string, position: Position | null, orientation: Orientation | null, scale_x: number = 1.0, scale_y: number = 1.0, opacity: number = 1.0) {
+        // var uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg =="
+        let plane;
+        var tex = THREE.ImageUtils.loadTexture(texture_uri);
+        if (label in this.objects) {
+            plane = <THREE.Mesh>this.objects[label];
+        } else {
+            var geom = new THREE.PlaneGeometry();
+            var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            plane = new THREE.Mesh(geom, material);
+            this._add_obj(plane, label);
+        }
+        this._set_position_orientation_if_provided(plane, position, orientation);
+        var mat = <THREE.MeshBasicMaterial>plane.material;
+        mat.map = tex;
+        mat.opacity = opacity;
+        plane.scale.set(scale_x, scale_y, 1.0);
+    }
+
+    add_plane(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", scale_x: number = 1.0, scale_y: number = 1.0, opacity: number = 1.0) {
+        let plane;
+        if (label in this.objects) {
+            plane = <THREE.Mesh>this.objects[label];
+        } else {
+            var geom = new THREE.PlaneGeometry();
+            var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            plane = new THREE.Mesh(geom, material);
+            this._add_obj(plane, label);
+        }
+        this._set_position_orientation_if_provided(plane, position, orientation);
+        var mat = <THREE.MeshBasicMaterial>plane.material;
+        mat.color.set(color);
+        mat.opacity = opacity;
+        plane.scale.set(scale_x, scale_y, 1.0);
+    }
+
     add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", point_arrays: number[], opacity: number = 1.0, point_size: number = 0.1) {
         let obj: THREE.Points;
 
@@ -250,24 +293,10 @@ export class ThreeViz {
 
         this._add_obj(obj, label)
 
-        // added = true
-
-        // if (!added) {
-        //     let geom = (<THREE.BufferGeometry>obj.geometry);
-
-        //     geom.attributes.position.array = new Float32Array(point_arrays);
-        //     (<THREE.BufferAttribute>geom.attributes.position).needsUpdate = true
-
-        //     geom.computeBoundingSphere();
-
-        // }
-
         mat.color = new THREE.Color(color)
         mat.opacity = opacity
 
         this._set_position_orientation_if_provided(obj, position, orientation)
-
-        // this.render()
     }
 
     add_line(label: string, point_arrays: number[], color: string = "#000000", thickness: number = 0.1, opacity: number = 1.0) {
@@ -287,12 +316,6 @@ export class ThreeViz {
 
         obj = new THREE.Line(geom, mat)
         this._add_obj(obj, label)
-
-        // let mat = (<THREE.LineBasicMaterial>this._get_first_mat(obj));
-        // mat.color = new THREE.Color(color);
-        // mat.opacity = opacity;
-
-        // this.render()
     }
 
     _snapshot() {

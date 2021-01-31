@@ -1,5 +1,5 @@
 from threeviz import send_command
-from threeviz.helpers import pointcloud_cmd, transform_to_cmd, points_to_line_cmd
+from threeviz.helpers import pointcloud_cmd, transform_to_cmd, points_to_line_cmd, image_to_uri
 
 # TODO allow for offset transform?
 def plot_3d(x, y, z, label, color="red", opacity=0.5, size=0.1):
@@ -14,6 +14,23 @@ def plot_3d(x, y, z, label, color="red", opacity=0.5, size=0.1):
 
 def plot_pose(pose, label, size=0.1):
     send_command(transform_to_cmd(pose, label, size))
+
+
+def plot_plane(pose, label, scale=(1, 1)):
+    cmd = transform_to_cmd(pose, label, 1.0)
+    cmd["type"] = "plane"
+    cmd["scale_x"] = scale[0]
+    cmd["scale_y"] = scale[1]
+    send_command(cmd)
+
+
+def plot_plane_tex(pose, label, image, scale=(1,1)):
+    cmd = transform_to_cmd(pose, label, 1.0)
+    cmd["type"] = "plane_tex"
+    cmd["uri"] = image_to_uri(image)
+    cmd["scale_x"] = scale[0]
+    cmd["scale_y"] = scale[1]
+    send_command(cmd)
 
 
 def plot_line_seg(x1, y1, z1, x2, y2, z2, label, color="black", opacity=0.5, size=0.01):
