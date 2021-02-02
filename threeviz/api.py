@@ -22,18 +22,22 @@ def plot_pose(pose, label, size=0.1):
     send_command(transform_to_cmd(pose, label, size))
 
 
-def plot_plane(pose, label, scale=(1, 1)):
+def plot_plane(pose, label, color="blue", scale=(1, 1)):
     cmd = transform_to_cmd(pose, label, 1.0)
     cmd["type"] = "plane"
     cmd["scale_x"] = scale[0]
     cmd["scale_y"] = scale[1]
+    cmd["color"] = "color"
     send_command(cmd)
 
 
-def plot_plane_tex(pose, label, image, scale=(1, 1)):
+def plot_plane_tex(pose, label, image, already_encoded=False, scale=(1, 1)):
     cmd = transform_to_cmd(pose, label, 1.0)
     cmd["type"] = "plane_tex"
-    cmd["uri"] = image_to_uri(image)
+    if not already_encoded:
+        cmd["uri"] = image_to_uri(image)
+    else:
+        cmd["uri"] = image
     cmd["scale_x"] = scale[0]
     cmd["scale_y"] = scale[1]
     send_command(cmd)
