@@ -61,7 +61,7 @@ def main(loop):
         #('/api', ApiHandler)
             ],
             debug=False)
-        app.listen(8765)
+        app.listen(port)
         print('starting')
 
     ioloop.IOLoop.current().start()

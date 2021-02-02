@@ -8,19 +8,25 @@ let winHeight = window.innerHeight;
 let scn = new ThreeViz(75, window.innerWidth - padding, window.innerHeight - padding)
 
 const queryString = window.location.search;
-console.log(queryString)
 const urlParams = new URLSearchParams(queryString);
-
 let port = urlParams.get('port')
 if (port == null) {
     port = '8765'
 }
 
+let host = urlParams.get('host')
+if (host == null) {
+    host = "localhost";
+}
+else {
+    host = window.location.host;
+    host = host.split(":")[0];
+}
 
 function startWebsocket() {
     let ws: WebSocket | null
 
-    ws = new WebSocket('ws://localhost:' + port + '/ws')
+    ws = new WebSocket('ws://' + host + ":" + port + '/ws')
 
     ws.onclose = function() {
         ws = null

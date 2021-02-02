@@ -68,6 +68,11 @@ def plot_cube_cloud(x, y, z, label, color="blue", opacity=0.5, size=0.01):
         }
     )
 
+def update_properties(label, pose):
+    cmd = transform_to_cmd(pose, label)
+    cmd["type"] = "update"
+    send_command(cmd)
+
 
 def clear_all():
     send_command({"type": "clear"})
