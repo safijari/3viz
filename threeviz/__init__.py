@@ -4,6 +4,7 @@ from tornado import websocket, web, ioloop
 from threading import Thread, Lock
 import time
 import os
+import pathlib
 try:
     import asyncio
     aio = True
@@ -22,7 +23,14 @@ state = {'clients': []}
 
 class IndexHandler(web.RequestHandler):
     def get(self):
-        with open('index.html') as ff:
+        folder = (pathlib.Path(__file__).parent.absolute())
+        with open(os.path.join(folder, '../deploy/threeviz/index.html')) as ff:
+            self.write(ff.read())
+
+class JSHandler(web.RequestHandler):
+    def get(self):
+        folder = (pathlib.Path(__file__).parent.absolute())
+        with open(os.path.join(folder, '../deploy/threeviz/index.js')) as ff:
             self.write(ff.read())
 
 
@@ -57,8 +65,8 @@ def main(loop):
         app = web.Application(
             [
                 ('/', IndexHandler),
+                ('/index.js', JSHandler),
                 ('/ws', SocketHandler),
-        #('/api', ApiHandler)
             ],
             debug=False)
         app.listen(port)
@@ -77,6 +85,9 @@ def send_command(cmd):
         send_command.thread.daemon = True
         send_command.thread.start()
 
+        if cmd == None:
+            return
+
         while True:
             with clients_lock:
                 if len(state['clients']) > 0:
@@ -84,6 +95,9 @@ def send_command(cmd):
             time.sleep(0.2)
 
         time.sleep(0.25)
+
+    if cmd == None:
+        return
 
     with clients_lock:
         for client in state['clients']:
