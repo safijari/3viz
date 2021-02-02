@@ -99,13 +99,17 @@ export class ThreeViz {
         this.gui.add(this.settings, "clear_all");
     }
 
-    set_default_position() {
-        console.log("setting default cam position");
-        this.camera.position.x = 5;
-        this.camera.position.y = 5;
-        this.camera.position.z = 5;
-        this.camera.lookAt(0, 0, 0);
+    move_camera(x: number, y: number, z: number, lx: number, ly: number, lz: number) {
+        this.camera.position.x = x;
+        this.camera.position.y = y;
+        this.camera.position.z = z;
+        this.camera.lookAt(lx, ly, lz);
+        this.controls.target = new THREE.Vector3(lx, ly, lz);
         this.camera.updateProjectionMatrix();
+    }
+
+    set_default_position() {
+        this.move_camera(5, 5, 5, 0, 0, 0);
     }
 
     reload_camera_posision() {

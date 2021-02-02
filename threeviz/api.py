@@ -1,5 +1,11 @@
 from threeviz import send_command
-from threeviz.helpers import pointcloud_cmd, transform_to_cmd, points_to_line_cmd, image_to_uri
+from threeviz.helpers import (
+    pointcloud_cmd,
+    transform_to_cmd,
+    points_to_line_cmd,
+    image_to_uri,
+)
+import numpy as np
 
 # TODO allow for offset transform?
 def plot_3d(x, y, z, label, color="red", opacity=0.5, size=0.1):
@@ -24,7 +30,7 @@ def plot_plane(pose, label, scale=(1, 1)):
     send_command(cmd)
 
 
-def plot_plane_tex(pose, label, image, scale=(1,1)):
+def plot_plane_tex(pose, label, image, scale=(1, 1)):
     cmd = transform_to_cmd(pose, label, 1.0)
     cmd["type"] = "plane_tex"
     cmd["uri"] = image_to_uri(image)
@@ -40,6 +46,12 @@ def plot_line_seg(x1, y1, z1, x2, y2, z2, label, color="black", opacity=0.5, siz
 
 
 def plot_cube_cloud(x, y, z, label, color="blue", opacity=0.5, size=0.01):
+    if isinstance(x, np.ndarray):
+        x = x.tolist()
+    if isinstance(y, np.ndarray):
+        y = y.tolist()
+    if isinstance(z, np.ndarray):
+        z = z.tolist()
     send_command(
         {
             "type": "cubecloud",
@@ -59,3 +71,17 @@ def clear_all():
 
 def delete(label):
     send_command({"type": "delete", "label": label})
+
+
+def move_camera(x, xl):
+    send_command(
+        {
+            "type": "move_camera",
+            "x": x.x,
+            "y": x.y,
+            "z": x.z,
+            "lx": xl.x,
+            "ly": xl.y,
+            "lz": xl.z,
+        }
+    )

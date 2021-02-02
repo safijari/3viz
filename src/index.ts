@@ -37,6 +37,9 @@ function startWebsocket() {
                 if (data.type == "delete") {
                     scn.delete_object(data.label);
                 }
+                if (data.type == "move_camera") {
+                    scn.move_camera(data.x, data.y, data.z, data.lx, data.ly, data.lz);
+                }
                 if (data.type == "axes") {
                     scn.add_axes(data.label, data.position, data.orientation, data.size);
                 } else if (data.type == "axes_list") {
