@@ -1,4 +1,4 @@
-from threeviz import send_command
+from threeviz.core import CommandSender
 from threeviz.helpers import (
     pointcloud_cmd,
     transform_to_cmd,
@@ -6,6 +6,15 @@ from threeviz.helpers import (
     image_to_uri,
 )
 import numpy as np
+
+
+def send_command(cmd):
+    try:
+        sender = send_command.sender
+    except Exception:
+        send_command.sender = CommandSender(8765)
+    send_command.sender.send(cmd)
+
 
 # TODO allow for offset transform?
 def plot_3d(x, y, z, label, color="red", opacity=0.5, size=0.1):
@@ -67,6 +76,7 @@ def plot_cube_cloud(x, y, z, label, color="blue", opacity=0.5, size=0.01):
             "size": size,
         }
     )
+
 
 def update_properties(label, pose):
     cmd = transform_to_cmd(pose, label)
