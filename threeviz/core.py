@@ -98,8 +98,6 @@ class CommandSender:
                     break
                 time.sleep(0.2)
 
-        time.sleep(0.25)
-
         with self.clients_lock:
             for client in self.clients:
                 client.write_message(
