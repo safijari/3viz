@@ -17,10 +17,18 @@ from threeviz.helpers import (
 )
 
 import msgpack
-
+import socket
 from tornado.log import enable_pretty_logging
 
 enable_pretty_logging()
+
+
+def get_ephemeral_port():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("", 0))
+    addr = s.getsockname()
+    s.close()
+    return addr[1]
 
 
 class IndexHandler(web.RequestHandler):
@@ -57,7 +65,9 @@ class SocketHandler(websocket.WebSocketHandler):
 
 
 class CommandSender:
-    def __init__(self, port=8765, wait=True, debug=False):
+    def __init__(self, port=None, wait=True, debug=False):
+        if port is None:
+            port = get_ephemeral_port()
         self.port = port
         self.clients_lock = Lock()
         self.clients = []
@@ -204,8 +214,12 @@ class CommandSender:
 ThreeViz = CommandSender
 
 
-def ThreeVizIPython(port):
+def ThreeVizIPython(port=None, wait=False):
     from IPython.display import IFrame, display, clear_output
+
+    if port is None:
+        port = get_ephemeral_port()
+
     clear_output()
     try:
         d = ThreeVizIPython.d
@@ -216,7 +230,7 @@ def ThreeVizIPython(port):
     if port in d:
         d[port]._delete()
 
-    viz = ThreeViz(port, wait=False)
+    viz = ThreeViz(port, wait=wait)
     time.sleep(1)
     display(
         IFrame(
@@ -224,6 +238,37 @@ def ThreeVizIPython(port):
             width=640,
             height=480,
         )
+    )
+
+    d[port] = viz
+
+    return viz
+
+
+def ThreeVizStreamlit(port=None, wait=False):
+    import streamlit.components as components
+
+    if port is None:
+        port = get_ephemeral_port()
+
+    try:
+        d = ThreeVizStreamlit.d
+    except Exception:
+        import asyncio
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        ThreeVizStreamlit.d = {}
+        d = ThreeVizStreamlit.d
+
+    if port in d:
+        d[port]._delete()
+
+    viz = ThreeViz(port, wait=wait)
+    time.sleep(1)
+
+    components.v1.iframe(
+        "http://localhost:" + str(port) + "?port=" + str(port), width=640, height=480
     )
 
     d[port] = viz
