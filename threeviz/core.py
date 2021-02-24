@@ -246,6 +246,11 @@ def ThreeVizIPython(port=None, wait=False):
 
 
 def ThreeVizStreamlit(port=None, wait=False):
+    import asyncio
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     import streamlit.components as components
 
     if port is None:
