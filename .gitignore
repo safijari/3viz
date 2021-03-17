@@ -1,5 +1,7 @@
-dist/
-__pycache__/
+.projectile
 node_modules/
-*.png
+test_image.png
+threeviz.egg-info
+*.mypy_cache
 *.pyc
+test.py
