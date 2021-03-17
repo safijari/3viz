@@ -249,6 +249,7 @@ export class ThreeViz {
         } else {
             var geom = new THREE.PlaneGeometry();
             var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            material.transparent = true;
             plane = new THREE.Mesh(geom, material);
             this._add_obj(plane, label);
         }

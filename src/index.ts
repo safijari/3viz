@@ -62,7 +62,7 @@ function startWebsocket() {
                 } else if (data.type == "plane") {
                     scn.add_plane(data.label, data.position, data.orientation, data.scale_x, data.scale_y);
                 } else if (data.type == "plane_tex") {
-                    scn.add_plane_texture(data.label, data.uri, data.position, data.orientation, data.scale_x, data.scale_y);
+                    scn.add_plane_texture(data.label, data.uri, data.position, data.orientation, data.scale_x, data.scale_y, data.opacity);
                 }
 
             }

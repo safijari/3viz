@@ -149,7 +149,7 @@ class CommandSender:
         cmd["color"] = "color"
         self.send(cmd)
 
-    def plot_plane_tex(self, pose, label, image, already_encoded=False, scale=(1, 1)):
+    def plot_plane_tex(self, pose, label, image, already_encoded=False, scale=(1, 1), opacity=1.0):
         cmd = transform_to_cmd(pose, label, 1.0)
         cmd["type"] = "plane_tex"
         if not already_encoded:
@@ -158,6 +158,7 @@ class CommandSender:
             cmd["uri"] = image
         cmd["scale_x"] = scale[0]
         cmd["scale_y"] = scale[1]
+        cmd["opacity"] = opacity
         self.send(cmd)
 
     def plot_line_seg(
