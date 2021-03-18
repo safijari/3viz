@@ -8,6 +8,7 @@ import time
 import os
 import pathlib
 from tiny_tf.tf import Transform
+import numpy as np
 
 from threeviz.helpers import (
     pointcloud_cmd,
