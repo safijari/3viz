@@ -150,7 +150,9 @@ class CommandSender:
         cmd["color"] = "color"
         self.send(cmd)
 
-    def plot_plane_tex(self, pose, label, image, already_encoded=False, scale=(1, 1), opacity=1.0):
+    def plot_plane_tex(
+        self, pose, label, image, already_encoded=False, scale=(1, 1), opacity=1.0
+    ):
         cmd = transform_to_cmd(pose, label, 1.0)
         cmd["type"] = "plane_tex"
         if not already_encoded:
@@ -236,7 +238,7 @@ def ThreeVizIPython(port=None, wait=False):
     time.sleep(1)
     display(
         IFrame(
-            "http://localhost:" + str(port) + "?port=" + str(port),
+            "https://safijari.github.io/threeviz?port=" + str(port),
             width=640,
             height=480,
         )
@@ -275,7 +277,7 @@ def ThreeVizStreamlit(port=None, wait=False):
     time.sleep(1)
 
     components.v1.iframe(
-        "http://localhost:" + str(port) + "?port=" + str(port), width=640, height=480
+        "https://safijari.github.io/threeviz?port=" + str(port), width=640, height=480
     )
 
     d[port] = viz
