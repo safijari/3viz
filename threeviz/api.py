@@ -6,13 +6,14 @@ from threeviz.helpers import (
     image_to_uri,
 )
 import numpy as np
+import os
 
 
 def send_command(cmd):
     try:
         sender = send_command.sender
     except Exception:
-        send_command.sender = CommandSender(8765)
+        send_command.sender = CommandSender(int(os.environ.get("THREEVIZ_PORT", 8765)))
     send_command.sender.send(cmd)
 
 
