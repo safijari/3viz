@@ -72,15 +72,58 @@ function startWebsocket() {
 
 console.log(scn)
 
-// add axis to the scene
-let axis = new THREE.AxesHelper(10)
+const raycaster = new THREE.Raycaster();
+raycaster.params!.Points!.threshold = 0.05;
+console.log(raycaster);
+const pointer = new THREE.Vector2();
+const wpointer = new THREE.Vector2();
+
+const infodiv = document.createElement("div");
+infodiv.innerHTML = "hey";
+infodiv.setAttribute("id", "infodiv")
+
+infodiv.style.top = "-1000px"
+infodiv.style.left = "-1000px"
+
+document.body.appendChild(infodiv);
 
 document.body.appendChild(scn.renderer.domElement)
+
 
 function animate() {
     setTimeout(function() {
         requestAnimationFrame(animate);
     }, 1000 / 60);
+
+    if (wpointer.x > 0 && wpointer.y > 0) {
+	raycaster.setFromCamera(pointer, scn.camera);
+	const intersects = raycaster.intersectObjects( scn.scene.children, true );
+
+	var lehtml = "";
+
+	// console.log(intersects);
+
+	infodiv.style.visibility = "hidden";
+	for (let i = 0; i < intersects.length; i++) {
+	    var intr = intersects[i];
+	    if (intr.object.name == "root" || intr.object.name == "rootgrid") {
+		continue;
+	    }
+	    // console.log(intr.object.name);
+	    // console.log(intr);
+	    infodiv.style.top = (wpointer.y + 10) + "px";
+	    infodiv.style.left = (wpointer.x + 10) + "px";
+	    if (! lehtml.includes(intr.object.name)) {
+		lehtml += intr.object.name + "<br/>";
+	    }
+	    infodiv.style.visibility = "visible";
+	}
+	infodiv.innerHTML = lehtml;
+	wpointer.x = -1;
+	wpointer.y = -1;
+
+    }
+
     scn.render();
     if (winWidth != window.innerWidth || winHeight != window.innerHeight) {
         winWidth = window.innerWidth;
@@ -88,6 +131,16 @@ function animate() {
         scn.update_size(winWidth - padding, winHeight - padding);
     }
 }
+
+
+function onPointerMove(event: MouseEvent) {
+    wpointer.x = event.clientX;
+    wpointer.y = event.clientY;
+    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+}
+
+window.addEventListener( 'pointermove', onPointerMove );
 
 startWebsocket()
 animate()

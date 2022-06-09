@@ -75,6 +75,7 @@ export class ThreeViz {
 
         this.set_up(this.camera)
         this.set_up(this.grid)
+	this.grid.name = "rootgrid";
 
         this.set_orientation(this.grid, THREE.MathUtils.degToRad(90), 0, 0)
 
@@ -192,6 +193,7 @@ export class ThreeViz {
         this.set_up(obj)
         this.objects[label] = obj
         this.scene.add(obj)
+	obj.name = label;
     }
 
     add_cube_cloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", xarr: number[], yarr: number[], zarr: number[], opacity: number = 1.0, point_size: number = 0.1) {
@@ -203,11 +205,13 @@ export class ThreeViz {
 
         for (var i = 0; i < xarr.length; i++) {
             var cube = new THREE.Mesh(geometry, material)
+	    cube.name = label;
             cube.position.set(xarr[i], yarr[i], zarr[i])
             group.add(cube)
         }
 
         this._add_obj(group, label)
+	group.name = label;
 
         this._set_position_orientation_if_provided(group, position, orientation)
     }
@@ -233,6 +237,7 @@ export class ThreeViz {
             axes = this.objects[label];
         } else {
             axes = new THREE.AxesHelper(1)
+	    axes.name = label;
             this._add_obj(axes, label)
         }
 
@@ -243,7 +248,8 @@ export class ThreeViz {
     add_plane_texture(label: string, texture_uri: string, position: Position | null, orientation: Orientation | null, scale_x: number = 1.0, scale_y: number = 1.0, opacity: number = 1.0) {
         // var uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg =="
         let plane;
-        var tex = THREE.ImageUtils.loadTexture(texture_uri);
+        // var tex = THREE.ImageUtils.loadTexture(texture_uri);
+	var tex = new THREE.TextureLoader().load(texture_uri);
         if (label in this.objects) {
             plane = <THREE.Mesh>this.objects[label];
         } else {
@@ -292,7 +298,7 @@ export class ThreeViz {
             transparent: true, opacity: opacity
         })
         let geom = new THREE.BufferGeometry()
-        geom.addAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
+        geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
 
         obj = new THREE.Points(geom, mat)
 
@@ -317,7 +323,7 @@ export class ThreeViz {
         })
 
         let geom = new THREE.BufferGeometry()
-        geom.addAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
+        geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
 
         obj = new THREE.Line(geom, mat)
         this._add_obj(obj, label)

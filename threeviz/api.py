@@ -69,6 +69,7 @@ def plot_cube_cloud(x, y, z, label, color="blue", opacity=0.5, size=0.01):
     send_command(
         {
             "type": "cubecloud",
+            "label": label,
             "xarr": x,
             "yarr": y,
             "zarr": z,
