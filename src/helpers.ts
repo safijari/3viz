@@ -283,7 +283,7 @@ export class ThreeViz {
         plane.scale.set(scale_x, scale_y, 1.0);
     }
 
-    add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", point_arrays: number[], opacity: number = 1.0, point_size: number = 0.1) {
+    add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, point_arrays: number[], color: string = "#ff0000",  opacity: number = 1.0, point_size: number = 0.1) {
         let obj: THREE.Points;
 
         if (label in this.objects) {
@@ -310,7 +310,7 @@ export class ThreeViz {
         this._set_position_orientation_if_provided(obj, position, orientation)
     }
 
-    add_line(label: string, point_arrays: number[], color: string = "#000000", thickness: number = 0.1, opacity: number = 1.0) {
+    add_line(label: string, position: Position | null, orientation: Orientation | null, point_arrays: number[], color: string = "#000000", thickness: number = 0.1, opacity: number = 1.0) {
         let obj: THREE.Line;
         if (label in this.objects) {
             obj = <THREE.Line>this.objects[label]
@@ -327,6 +327,8 @@ export class ThreeViz {
 
         obj = new THREE.Line(geom, mat)
         this._add_obj(obj, label)
+
+        this._set_position_orientation_if_provided(obj, position, orientation)
     }
 
     _snapshot() {

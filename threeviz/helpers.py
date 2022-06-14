@@ -33,15 +33,25 @@ def pose2d_to_cmd(i, label, size=0.25):
     return transform_to_cmd(t, label, size)
 
 
-def points_to_line_cmd(points, label, color, opacity, size):
+def transform_to_subcmd(pose):
     return {
+        "position": {"x": pose.x, "y": pose.y, "z": pose.z},
+        "orientation": {"x": pose.qx, "y": pose.qy, "z": pose.qz, "w": pose.qw},
+    }
+
+
+def points_to_line_cmd(points, label, color, opacity, size, pose=None):
+    data = {
         "type": "line",
         "positions": points,
         "label": str(label),
         "color": color,
         "opacity": opacity,
-        "size": size,
+        "thickness": size,
     }
+    if pose:
+        data.update(transform_to_subcmd(pose))
+    return data
 
 
 def project_laser(msg, xx, yy, rr):

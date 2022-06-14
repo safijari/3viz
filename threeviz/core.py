@@ -9,6 +9,7 @@ import os
 import pathlib
 from tiny_tf.tf import Transform
 import numpy as np
+import itertools
 
 from threeviz.helpers import (
     pointcloud_cmd,
@@ -151,25 +152,46 @@ class CommandSender:
         self.send(cmd)
 
     def plot_plane_tex(
-        self, pose, label, image, already_encoded=False, scale=(1, 1), opacity=1.0
+            self, pose, label, image, already_encoded=False, scale=None, opacity=1.0, pixel_to_meters = 0.1
     ):
+        if scale is None:
+            h, w = image.shape[:2]
+            sw = w * pixel_to_meters
+            sh = h * pixel_to_meters
+        else:
+            sw, sh = scale
         cmd = transform_to_cmd(pose, label, 1.0)
         cmd["type"] = "plane_tex"
         if not already_encoded:
             cmd["uri"] = image_to_uri(image)
         else:
             cmd["uri"] = image
-        cmd["scale_x"] = scale[0]
-        cmd["scale_y"] = scale[1]
+        cmd["scale_x"] = sw
+        cmd["scale_y"] = sh
         cmd["opacity"] = opacity
         self.send(cmd)
 
     def plot_line_seg(
-        self, x1, y1, z1, x2, y2, z2, label, color="black", opacity=0.5, size=0.01
+            self, x1, y1, z1, x2, y2, z2, label, color="black", opacity=0.5, size=0.01, pose=None,
     ):
         self.send(
-            points_to_line_cmd([x1, y1, z1, x2, y2, z2], label, color, opacity, size)
+            points_to_line_cmd([x1, y1, z1, x2, y2, z2], label, color, opacity, size, pose=pose)
         )
+
+    def plot_polygon(
+        self,
+        points,
+        label,
+        color="black",
+        opacity=0.5,
+        size=0.01,
+        one_point_per_element=True,
+        **kwargs
+    ):
+        if not one_point_per_element:
+            points = zip(points)
+        points = list(itertools.chain(*points))
+        self.send(points_to_line_cmd(points, label, color, opacity, size, **kwargs))
 
     def plot_cube_cloud(self, x, y, z, label, color="blue", opacity=0.5, size=0.01):
         if isinstance(x, np.ndarray):

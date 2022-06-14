@@ -54,11 +54,11 @@ function startWebsocket() {
                         scn.add_axes(el.label, el.position, el.orientation, el.size);
                     }
                 } else if (data.type == "pointcloud") {
-                    scn.add_pointcloud(data.label, data.position, data.orientation, data.color, data.arrs, data.opacity, data.size);
+                    scn.add_pointcloud(data.label, data.position, data.orientation, data.arrs, data.color, data.opacity, data.size);
                 } else if (data.type == "cubecloud") {
                     scn.add_cube_cloud(data.label, data.position, data.orientation, data.color, data.xarr, data.yarr, data.zarr, data.opacity, data.size);
                 } else if (data.type == "line") {
-                    scn.add_line(data.label, data.positions, data.color, data.thickness, data.opacity);
+                    scn.add_line(data.label, data.position, data.orientation, data.positions, data.color, data.thickness, data.opacity);
                 } else if (data.type == "plane") {
                     scn.add_plane(data.label, data.position, data.orientation, data.scale_x, data.scale_y);
                 } else if (data.type == "plane_tex") {
@@ -73,7 +73,9 @@ function startWebsocket() {
 console.log(scn)
 
 const raycaster = new THREE.Raycaster();
-raycaster.params!.Points!.threshold = 0.05;
+raycaster.params!.Points!.threshold = 0.1;
+raycaster.params!.Line!.threshold = 0.1;
+raycaster.params!.Mesh!.threshold = 0.1;
 console.log(raycaster);
 const pointer = new THREE.Vector2();
 const wpointer = new THREE.Vector2();
