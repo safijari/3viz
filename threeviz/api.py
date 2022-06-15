@@ -13,6 +13,7 @@ sender = CommandSender(int(os.environ.get("THREEVIZ_PORT", 8765)))
 plot_3d = sender.plot_3d
 plot_pose = sender.plot_pose
 plot_plane = sender.plot_plane
+plot_cylinder = sender.plot_cylinder
 plot_plane_tex = sender.plot_plane_tex
 plot_line_seg = sender.plot_line_seg
 plot_polygon = sender.plot_polygon

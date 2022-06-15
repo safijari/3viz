@@ -108,3 +108,13 @@ def image_base64(im, ext=".jpg"):
 
 def image_to_uri(im):
     return "data:image/png;base64," + image_base64(im, ".png")
+
+
+def make_circle_with_tri(radius, subdivisions=36):
+    pts = []
+    for i in np.linspace(0, np.pi * 2, subdivisions):
+        pts.append((radius * np.cos(i), radius * np.sin(i), 0))
+    pts.append((0, -radius / 2, 0))
+    pts.append((0, radius / 2, 0))
+    pts.append((radius, 0, 0))
+    return pts

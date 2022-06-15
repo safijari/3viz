@@ -273,6 +273,7 @@ export class ThreeViz {
         } else {
             var geom = new THREE.PlaneGeometry();
             var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            material.transparent = true;
             plane = new THREE.Mesh(geom, material);
             this._add_obj(plane, label);
         }
@@ -281,6 +282,24 @@ export class ThreeViz {
         mat.color.set(color);
         mat.opacity = opacity;
         plane.scale.set(scale_x, scale_y, 1.0);
+    }
+
+    add_cylinder(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", opacity: number = 1.0, radius: number = 1.0, height: number = 1.0) {
+        let cyl;
+        if (label in this.objects) {
+            cyl = <THREE.Mesh>this.objects[label];
+        } else {
+            var geom = new THREE.CylinderGeometry(radius, radius, height, 36);
+            var material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide });
+            material.transparent = true;
+            cyl = new THREE.Mesh(geom, material);
+            this._add_obj(cyl, label);
+        }
+        this._set_position_orientation_if_provided(cyl, position, orientation);
+        var mat = <THREE.MeshPhongMaterial>cyl.material;
+        mat.color.set(color);
+        mat.opacity = opacity;
+	console.log(opacity)
     }
 
     add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, point_arrays: number[], color: string = "#ff0000",  opacity: number = 1.0, point_size: number = 0.1) {

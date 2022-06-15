@@ -61,6 +61,9 @@ function startWebsocket() {
                     scn.add_line(data.label, data.position, data.orientation, data.positions, data.color, data.thickness, data.opacity);
                 } else if (data.type == "plane") {
                     scn.add_plane(data.label, data.position, data.orientation, data.scale_x, data.scale_y);
+                } else if (data.type == "cylinder") {
+                    scn.add_cylinder(data.label, data.position, data.orientation,
+				     data.color, data.opacity, data.radius, data.height);
                 } else if (data.type == "plane_tex") {
                     scn.add_plane_texture(data.label, data.uri, data.position, data.orientation, data.scale_x, data.scale_y, data.opacity);
                 }

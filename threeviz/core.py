@@ -151,8 +151,24 @@ class CommandSender:
         cmd["color"] = "color"
         self.send(cmd)
 
+    def plot_cylinder(self, pose, label, color="blue", radius=1, height=1, opacity=1):
+        cmd = transform_to_cmd(pose, label, 1.0)
+        cmd["type"] = "cylinder"
+        cmd["radius"] = radius
+        cmd["color"] = color
+        cmd["height"] = height
+        cmd["opacity"] = opacity
+        self.send(cmd)
+
     def plot_plane_tex(
-            self, pose, label, image, already_encoded=False, scale=None, opacity=1.0, pixel_to_meters = 0.1
+        self,
+        pose,
+        label,
+        image,
+        already_encoded=False,
+        scale=None,
+        opacity=1.0,
+        pixel_to_meters=0.1,
     ):
         if scale is None:
             h, w = image.shape[:2]
@@ -172,10 +188,23 @@ class CommandSender:
         self.send(cmd)
 
     def plot_line_seg(
-            self, x1, y1, z1, x2, y2, z2, label, color="black", opacity=0.5, size=0.01, pose=None,
+        self,
+        x1,
+        y1,
+        z1,
+        x2,
+        y2,
+        z2,
+        label,
+        color="black",
+        opacity=0.5,
+        size=0.01,
+        pose=None,
     ):
         self.send(
-            points_to_line_cmd([x1, y1, z1, x2, y2, z2], label, color, opacity, size, pose=pose)
+            points_to_line_cmd(
+                [x1, y1, z1, x2, y2, z2], label, color, opacity, size, pose=pose
+            )
         )
 
     def plot_polygon(
