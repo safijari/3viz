@@ -2,3 +2,11 @@
   - nvm, node 10.5 at least
   - Need to do npm install on the 3viz folder
   - Then npm start
+* Roadmap:
+  - [X] export/import support
+  - [ ] self contained html support
+  - [ ] model loading
+  - [ ] more primitives
+  - [ ] more unified api
+  - [ ] composite objects
+  - [ ] batch commands
