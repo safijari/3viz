@@ -138,7 +138,9 @@ class CommandSender:
             x = [x]
             y = [y]
             z = [z]
-        self.send(pointcloud_cmd(x, y, z, label, color, opacity, size))
+        cmd = pointcloud_cmd(x, y, z, label, color, opacity, size)
+        self.send(cmd)
+        return cmd
 
     def plot_pose(self, pose, label, size=0.1):
         self.send(transform_to_cmd(pose, label, size))
@@ -150,6 +152,7 @@ class CommandSender:
         cmd["scale_y"] = scale[1]
         cmd["color"] = "color"
         self.send(cmd)
+        return cmd
 
     def plot_cylinder(self, pose, label, color="blue", radius=1, height=1, opacity=1):
         cmd = transform_to_cmd(pose, label, 1.0)
@@ -159,6 +162,7 @@ class CommandSender:
         cmd["height"] = height
         cmd["opacity"] = opacity
         self.send(cmd)
+        return cmd
 
     def plot_plane_tex(
         self,
@@ -186,6 +190,7 @@ class CommandSender:
         cmd["scale_y"] = sh
         cmd["opacity"] = opacity
         self.send(cmd)
+        return cmd
 
     def plot_line_seg(
         self,
@@ -201,11 +206,11 @@ class CommandSender:
         size=0.01,
         pose=None,
     ):
-        self.send(
-            points_to_line_cmd(
-                [x1, y1, z1, x2, y2, z2], label, color, opacity, size, pose=pose
-            )
+        cmd = points_to_line_cmd(
+            [x1, y1, z1, x2, y2, z2], label, color, opacity, size, pose=pose
         )
+        self.send(cmd)
+        return cmd
 
     def plot_polygon(
         self,
@@ -220,7 +225,9 @@ class CommandSender:
         if not one_point_per_element:
             points = zip(points)
         points = list(itertools.chain(*points))
-        self.send(points_to_line_cmd(points, label, color, opacity, size, **kwargs))
+        cmd = points_to_line_cmd(points, label, color, opacity, size, **kwargs)
+        self.send(cmd)
+        return cmd
 
     def plot_cube_cloud(self, x, y, z, label, color="blue", opacity=0.5, size=0.01):
         if isinstance(x, np.ndarray):
@@ -229,41 +236,46 @@ class CommandSender:
             y = y.tolist()
         if isinstance(z, np.ndarray):
             z = z.tolist()
-        self.send(
-            {
-                "type": "cubecloud",
-                "xarr": x,
-                "yarr": y,
-                "zarr": z,
-                "color": color,
-                "opacity": opacity,
-                "size": size,
-            }
-        )
+        cmd = {
+            "type": "cubecloud",
+            "xarr": x,
+            "yarr": y,
+            "zarr": z,
+            "color": color,
+            "opacity": opacity,
+            "size": size,
+        }
+        self.send(cmd)
+        return cmd
 
     def update_properties(self, label, pose):
         cmd = transform_to_cmd(pose, label)
         cmd["type"] = "update"
         self.send(cmd)
+        return cmd
 
     def clear_all(self):
-        self.send({"type": "clear"})
+        cmd = {"type": "clear"}
+        self.send(cmd)
+        return cmd
 
     def delete(self, label):
-        self.send({"type": "delete", "label": label})
+        cmd = {"type": "delete", "label": label}
+        self.send(cmd)
+        return cmd
 
     def move_camera(self, x, xl):
-        self.send(
-            {
-                "type": "move_camera",
-                "x": x.x,
-                "y": x.y,
-                "z": x.z,
-                "lx": xl.x,
-                "ly": xl.y,
-                "lz": xl.z,
-            }
-        )
+        cmd = {
+            "type": "move_camera",
+            "x": x.x,
+            "y": x.y,
+            "z": x.z,
+            "lx": xl.x,
+            "ly": xl.y,
+            "lz": xl.z,
+        }
+        self.send(cmd)
+        return cmd
 
 
 ThreeViz = CommandSender
