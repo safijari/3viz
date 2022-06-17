@@ -52,7 +52,7 @@ export class ThreeViz {
     scene: THREE.Scene = new THREE.Scene()
     ray_caster: THREE.Raycaster = new THREE.Raycaster()
     gui: dat.GUI = new dat.GUI({ autoPlace: true })
-    renderer: THREE.Renderer = new THREE.WebGLRenderer()
+    renderer: THREE.Renderer = new THREE.WebGLRenderer({ antialias: true })
     grid: THREE.GridHelper = new THREE.GridHelper(10, 10)
 
     camera: THREE.PerspectiveCamera
@@ -119,6 +119,7 @@ export class ThreeViz {
         this.camera.position.z = z;
         this.camera.lookAt(lx, ly, lz);
         this.controls.target = new THREE.Vector3(lx, ly, lz);
+        this.controls.update()
         this.camera.updateProjectionMatrix();
     }
 
