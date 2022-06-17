@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 
 interface Position {
     x: number,
@@ -56,17 +58,17 @@ export class ThreeViz {
     camera: THREE.PerspectiveCamera
     controls: OrbitControls
     objects: Record<string, THREE.Object3D>
-    light: THREE.AmbientLight;
+    light: THREE.PointLight;
 
     loader = new THREE.TextureLoader();
+    model_loader = new GLTFLoader();
 
     settings = { fov: 75, status: "none", default_cam: () => { this.set_default_position(); }, clear_all: () => { this.clear_all_objects(); } };
 
     constructor(fov: number, width: number, height: number) {
         this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);
-        this.light = new THREE.AmbientLight(0x404040); // soft white light
-        this.light.intensity = 10;
-        this.scene.add(this.light);
+        this.light = new THREE.PointLight(0x404040); // soft white light
+        this.light.intensity = 6;
 
         this.scene.background = new THREE.Color(0xf0f0f0)
         this.objects = {}
@@ -75,7 +77,8 @@ export class ThreeViz {
 
         this.set_up(this.camera)
         this.set_up(this.grid)
-	this.grid.name = "rootgrid";
+        this.scene.add(this.light);
+        this.grid.name = "rootgrid";
 
         this.set_orientation(this.grid, THREE.MathUtils.degToRad(90), 0, 0)
 
@@ -87,6 +90,10 @@ export class ThreeViz {
         gridmat.transparent = true;
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.addEventListener('change', (function(this: any) {
+            this.light.position.copy(this.camera.position);
+        }).bind(this));
+
         this.set_default_position();
         this.reload_camera_posision();
 
@@ -98,6 +105,12 @@ export class ThreeViz {
         this.gui.add(this.settings, "fov", 50, 100).onChange((v) => { this.camera.fov = v; this.camera.updateProjectionMatrix(); });
         this.gui.add(this.settings, "default_cam");
         this.gui.add(this.settings, "clear_all");
+        let that = this;
+        this.light.position.copy(this.camera.position);
+    }
+
+    add_gltf_model(model: any) {
+        this.scene.add(model.scene);
     }
 
     move_camera(x: number, y: number, z: number, lx: number, ly: number, lz: number) {
@@ -193,7 +206,7 @@ export class ThreeViz {
         this.set_up(obj)
         this.objects[label] = obj
         this.scene.add(obj)
-	obj.name = label;
+        obj.name = label;
     }
 
     add_cube_cloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", xarr: number[], yarr: number[], zarr: number[], opacity: number = 1.0, point_size: number = 0.1) {
@@ -205,13 +218,13 @@ export class ThreeViz {
 
         for (var i = 0; i < xarr.length; i++) {
             var cube = new THREE.Mesh(geometry, material)
-	    cube.name = label;
+            cube.name = label;
             cube.position.set(xarr[i], yarr[i], zarr[i])
             group.add(cube)
         }
 
         this._add_obj(group, label)
-	group.name = label;
+        group.name = label;
 
         this._set_position_orientation_if_provided(group, position, orientation)
     }
@@ -237,7 +250,7 @@ export class ThreeViz {
             axes = this.objects[label];
         } else {
             axes = new THREE.AxesHelper(1)
-	    axes.name = label;
+            axes.name = label;
             this._add_obj(axes, label)
         }
 
@@ -249,7 +262,7 @@ export class ThreeViz {
         // var uri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg =="
         let plane;
         // var tex = THREE.ImageUtils.loadTexture(texture_uri);
-	var tex = new THREE.TextureLoader().load(texture_uri);
+        var tex = new THREE.TextureLoader().load(texture_uri);
         if (label in this.objects) {
             plane = <THREE.Mesh>this.objects[label];
         } else {
@@ -299,10 +312,10 @@ export class ThreeViz {
         var mat = <THREE.MeshPhongMaterial>cyl.material;
         mat.color.set(color);
         mat.opacity = opacity;
-	console.log(opacity)
+        console.log(opacity)
     }
 
-    add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, point_arrays: number[], color: string = "#ff0000",  opacity: number = 1.0, point_size: number = 0.1) {
+    add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, point_arrays: number[], color: string = "#ff0000", opacity: number = 1.0, point_size: number = 0.1) {
         let obj: THREE.Points;
 
         if (label in this.objects) {
