@@ -143,7 +143,9 @@ class CommandSender:
         return cmd
 
     def plot_pose(self, pose, label, size=0.1):
-        self.send(transform_to_cmd(pose, label, size))
+        cmd = transform_to_cmd(pose, label, size)
+        self.send(cmd)
+        return cmd
 
     def plot_plane(self, pose, label, color="blue", scale=(1, 1)):
         cmd = transform_to_cmd(pose, label, 1.0)

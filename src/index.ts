@@ -5,7 +5,7 @@ import { encode, decode } from 'messagepack';
 let padding = 20;
 let winWidth = window.innerWidth;
 let winHeight = window.innerHeight;
-let scn = new ThreeViz(75, window.innerWidth - padding, window.innerHeight - padding)
+let scn = new ThreeViz(75, window.innerWidth - padding, window.innerHeight - padding - 30)
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -99,8 +99,9 @@ fileinput.type = "file"
 fileinput.addEventListener('change', function(e: Event) {
     (<HTMLInputElement>(e.target)).files![0]!.text().then(function(v) {
         let res = JSON.parse(v);
-        console.log(res);
+        // console.log(res);
         res.forEach(process_cmd);
+        (<HTMLInputElement>(e.target)).value = "";
     });
 });
 
@@ -152,7 +153,7 @@ function animate() {
     if (winWidth != window.innerWidth || winHeight != window.innerHeight) {
         winWidth = window.innerWidth;
         winHeight = window.innerHeight;
-        scn.update_size(winWidth - padding, winHeight - padding);
+        scn.update_size(winWidth - padding, winHeight - padding - 30);
     }
 }
 

@@ -52,7 +52,7 @@ export class ThreeViz {
     scene: THREE.Scene = new THREE.Scene()
     ray_caster: THREE.Raycaster = new THREE.Raycaster()
     gui: dat.GUI = new dat.GUI({ autoPlace: true })
-    renderer: THREE.Renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer: THREE.Renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true })
     grid: THREE.GridHelper = new THREE.GridHelper(10, 10)
 
     camera: THREE.PerspectiveCamera
