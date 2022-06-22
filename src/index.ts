@@ -161,14 +161,14 @@ function animate() {
 function onPointerMove(event: MouseEvent) {
     wpointer.x = event.clientX;
     wpointer.y = event.clientY;
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    pointer.x = (event.clientX / (window.innerWidth - padding)) * 2 - 1;
+    pointer.y = - (event.clientY / (window.innerHeight - padding - 30)) * 2 + 1;
 }
 
 function onKeyDown(event: KeyboardEvent) {
     if (event.key.toLowerCase() == "f") {
-        scn.controls.target.copy(last_obj_hovered.object.position);
-        var p = last_obj_hovered.object.position;
+        console.log(last_obj_hovered);
+        var p = last_obj_hovered.point;
         var dir = new THREE.Vector3();
         dir.subVectors(scn.camera.position, p).normalize();
         scn.camera.position.set(p.x + dir.x * 5, p.y + dir.y * 5, p.z + dir.z * 5);
