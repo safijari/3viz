@@ -167,7 +167,7 @@ function onPointerMove(event: MouseEvent) {
 
 function onKeyDown(event: KeyboardEvent) {
     if (event.key.toLowerCase() == "f") {
-        console.log(last_obj_hovered);
+        scn.controls.target.copy(last_obj_hovered.point);
         var p = last_obj_hovered.point;
         var dir = new THREE.Vector3();
         dir.subVectors(scn.camera.position, p).normalize();
