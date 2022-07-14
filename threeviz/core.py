@@ -10,6 +10,7 @@ import pathlib
 from tiny_tf.tf import Transform
 import numpy as np
 import itertools
+import json
 
 from threeviz.helpers import (
     pointcloud_cmd,
@@ -82,6 +83,23 @@ class CommandSender:
         self.thread.daemon = True
         self.thread.start()
         self.queue.get()
+        self.recording = []
+        self.do_recording = False
+
+    def start_recording(self):
+        self.do_recording = True
+
+    def stop_recording(self):
+        self.do_recording = False
+
+    def flush_recording(self):
+        ret = self.recording
+        self.recording = []
+        return ret
+
+    def stop_and_flush_recording(self):
+        self.stop_recording()
+        return self.flush_recording()
 
     def _main(self):
         app = web.Application(
@@ -104,6 +122,8 @@ class CommandSender:
         ioloop.IOLoop.current().start()
 
     def send(self, cmd):
+        if self.do_recording:
+            self.recording.append(json.loads(json.dumps(cmd)))
         if self.should_wait:
             while True:
                 if len(self.clients) > 0:
