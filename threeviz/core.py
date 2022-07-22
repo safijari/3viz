@@ -176,6 +176,22 @@ class CommandSender:
         self.send(cmd)
         return cmd
 
+    def plot_text(self, pose, label, text, color="red", scale=(1, 1), opacity=1):
+        cmd = transform_to_cmd(pose + Transform.from_euler_deg(roll=90), label, 1.0)
+        cmd["type"] = "text"
+        if isinstance(scale, tuple):
+            sx, sy = scale
+        else:
+            sx = scale
+            sy = scale
+        cmd["scale_x"] = sx
+        cmd["scale_y"] = sy
+        cmd["color"] = color
+        cmd["opacity"] = opacity
+        cmd["text"] = text
+        self.send(cmd)
+        return cmd
+
     def plot_cylinder(self, pose, label, color="blue", radius=1, height=1, opacity=1):
         cmd = transform_to_cmd(pose, label, 1.0)
         cmd["type"] = "cylinder"

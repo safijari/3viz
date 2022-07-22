@@ -53,6 +53,8 @@ function process_cmd(data: any) {
             data.color, data.opacity, data.radius, data.height);
     } else if (data.type == "plane_tex") {
         scn.add_plane_texture(data.label, data.uri, data.position, data.orientation, data.scale_x, data.scale_y, data.opacity);
+    } else if (data.type == "text") {
+        scn.add_text(data.label, data.position, data.orientation, data.color, data.scale_x, data.scale_y, data.opacity, data.text);
     }
 }
 
@@ -99,7 +101,6 @@ fileinput.type = "file"
 fileinput.addEventListener('change', function(e: Event) {
     (<HTMLInputElement>(e.target)).files![0]!.text().then(function(v) {
         let res = JSON.parse(v);
-        // console.log(res);
         res.forEach(process_cmd);
         (<HTMLInputElement>(e.target)).value = "";
     });
@@ -181,3 +182,7 @@ window.addEventListener('keydown', onKeyDown);
 
 startWebsocket()
 animate()
+
+// setTimeout(() => { scn.add_text("testtext", null, null, "red", 1, 1, 1.0, "testtest"); }, 1000)
+
+

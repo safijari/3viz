@@ -48,6 +48,7 @@ interface HasMaterial {
     material: THREE.Material | THREE.Material[]
 }
 
+
 export class ThreeViz {
     scene: THREE.Scene = new THREE.Scene()
     ray_caster: THREE.Raycaster = new THREE.Raycaster()
@@ -55,17 +56,20 @@ export class ThreeViz {
     renderer: THREE.Renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true })
     grid: THREE.GridHelper = new THREE.GridHelper(10, 10)
 
-    camera: THREE.PerspectiveCamera
-    controls: OrbitControls
-    objects: Record<string, THREE.Object3D>
+    camera: THREE.PerspectiveCamera;
+    controls: OrbitControls;
+    objects: Record<string, THREE.Object3D>;
     light: THREE.PointLight;
 
     loader = new THREE.TextureLoader();
     model_loader = new GLTFLoader();
+    font_loader = new THREE.FontLoader();
+    font: THREE.Font | null = null;
 
     settings = { fov: 75, status: "none", default_cam: () => { this.set_default_position(); }, clear_all: () => { this.clear_all_objects(); } };
 
     constructor(fov: number, width: number, height: number) {
+        this.font_loader.load("helvetiker_regular.typeface.json", (font) => { this.font = font; console.log(font); }, (e) => { }, (e) => { console.log("error"); console.log(e); })
         this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);
         this.light = new THREE.PointLight(0x404040); // soft white light
         this.light.intensity = 6;
@@ -296,6 +300,34 @@ export class ThreeViz {
         mat.color.set(color);
         mat.opacity = opacity;
         plane.scale.set(scale_x, scale_y, 1.0);
+    }
+
+    add_text(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", scale_x: number = 1.0, scale_y: number = 1.0, opacity: number = 1.0, text: string = "text") {
+        if (this.font == null) {
+            console.log("Font was null");
+            return
+        }
+        let obj;
+        if (label in this.objects) {
+            obj = <THREE.Mesh>this.objects[label];
+        } else {
+            var geom = new THREE.TextGeometry(text, {
+                font: this.font,
+                size: 1,
+                height: 0,
+                curveSegments: 12,
+
+            });
+            var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            material.transparent = true;
+            obj = new THREE.Mesh(geom, material);
+            this._add_obj(obj, label);
+        }
+        this._set_position_orientation_if_provided(obj, position, orientation);
+        var mat = <THREE.MeshBasicMaterial>obj.material;
+        mat.color.set(color);
+        mat.opacity = opacity;
+        obj.scale.set(scale_x, scale_y, 1.0);
     }
 
     add_cylinder(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", opacity: number = 1.0, radius: number = 1.0, height: number = 1.0) {
