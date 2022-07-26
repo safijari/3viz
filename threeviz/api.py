@@ -23,3 +23,5 @@ update_properties = sender.update_properties
 clear_all = sender.clear_all
 delete = sender.delete
 move_camera = sender.move_camera
+start_recording = sender.start_recording
+stop_recording = sender.stop_recording
