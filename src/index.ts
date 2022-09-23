@@ -7,6 +7,7 @@ let winWidth = window.innerWidth;
 let winHeight = window.innerHeight;
 let scn = new ThreeViz(75, window.innerWidth - padding, window.innerHeight - padding - 30)
 
+
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 let port = urlParams.get('port')
@@ -160,10 +161,18 @@ function animate() {
 
 
 function onPointerMove(event: MouseEvent) {
-    wpointer.x = event.clientX;
-    wpointer.y = event.clientY;
-    pointer.x = (event.clientX / (window.innerWidth - padding)) * 2 - 1;
-    pointer.y = - (event.clientY / (window.innerHeight - padding - 30)) * 2 + 1;
+    var e = event;
+    var rect = (<Element>(e.target)).getBoundingClientRect();
+    var x = e.clientX - rect.left; //x position within the element.
+    var y = e.clientY - rect.top;  //y position within the element.
+    y += padding
+    x += padding / 2
+    console.log(x + ", " + y)
+
+    wpointer.x = x;
+    wpointer.y = y;
+    pointer.x = (x / (window.innerWidth)) * 2 - 1;
+    pointer.y = - (y / (window.innerHeight)) * 2 + 1;
 }
 
 function onKeyDown(event: KeyboardEvent) {

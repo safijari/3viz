@@ -59,6 +59,8 @@ export class ThreeViz {
     camera: THREE.PerspectiveCamera;
     controls: OrbitControls;
     objects: Record<string, THREE.Object3D>;
+    objects_list: Record<string, any>;
+    objects_folder: dat.GUI = this.gui.addFolder("objects");
     light: THREE.PointLight;
 
     loader = new THREE.TextureLoader();
@@ -68,6 +70,15 @@ export class ThreeViz {
 
     settings = { fov: 75, status: "none", default_cam: () => { this.set_default_position(); }, clear_all: () => { this.clear_all_objects(); } };
 
+    focus(point: THREE.Vector3) {
+        this.controls.target.copy(point);
+        var p = point;
+        var dir = new THREE.Vector3();
+        dir.subVectors(this.camera.position, p).normalize();
+        this.camera.position.set(p.x + dir.x * 5, p.y + dir.y * 5, p.z + dir.z * 5);
+        this.controls.update();
+    }
+
     constructor(fov: number, width: number, height: number) {
         this.font_loader.load("helvetiker_regular.typeface.json", (font) => { this.font = font; console.log(font); }, (e) => { }, (e) => { console.log("error"); console.log(e); })
         this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);
@@ -76,6 +87,7 @@ export class ThreeViz {
 
         this.scene.background = new THREE.Color(0xf0f0f0)
         this.objects = {}
+        this.objects_list = {}
 
         this.renderer.setSize(width, height);
 
@@ -208,10 +220,15 @@ export class ThreeViz {
     }
 
     _add_obj(obj: THREE.Object3D, label: string) {
-        this.set_up(obj)
-        this.objects[label] = obj
-        this.scene.add(obj)
+        this.set_up(obj);
+        this.objects[label] = obj;
+        this.scene.add(obj);
         obj.name = label;
+
+        this.objects_list[label] = { "show/hide": () => { this.objects[label].visible = !this.objects[label].visible; }, "focus": () => { this.focus(this.objects[label].position) } };
+        var folder = this.objects_folder.addFolder(label);
+        folder.add(this.objects_list[label], "show/hide")
+        folder.add(this.objects_list[label], "focus")
     }
 
     add_cube_cloud(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", xarr: number[], yarr: number[], zarr: number[], opacity: number = 1.0, point_size: number = 0.1) {
@@ -240,6 +257,9 @@ export class ThreeViz {
         var geom = obj.geometry;
         geom.dispose();
         delete this.objects[label];
+
+        this.objects_folder.removeFolder(label);
+        delete this.objects_list[label];
     }
 
     clear_all_objects() {
