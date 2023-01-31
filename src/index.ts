@@ -55,6 +55,8 @@ function process_cmd(data: any) {
         scn.add_plane_texture(data.label, data.uri, data.position, data.orientation, data.scale_x, data.scale_y, data.opacity);
     } else if (data.type == "text") {
         scn.add_text(data.label, data.position, data.orientation, data.color, data.scale_x, data.scale_y, data.opacity, data.text);
+    } else if (data.type == "obj") {
+        scn.add_obj_model(data.label, data.data, data.position, data.orientation, data.uri);
     }
 }
 

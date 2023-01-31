@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { ObjectLoader } from 'three';
 
 
 interface Position {
@@ -63,6 +65,7 @@ export class ThreeViz {
 
     loader = new THREE.TextureLoader();
     model_loader = new GLTFLoader();
+    obj_loader = new OBJLoader();
     font_loader = new THREE.FontLoader();
     font: THREE.Font | null = null;
 
@@ -282,6 +285,27 @@ export class ThreeViz {
         mat.map = tex;
         mat.opacity = opacity;
         plane.scale.set(scale_x, scale_y, 1.0);
+    }
+
+    add_obj_model(label: string, data: string, position: Position | null, orientation: Orientation | null, texture_uri: string | null) {
+        let model;
+        if (label in this.objects) {
+            model = <THREE.Mesh>this.objects[label];
+        } else {
+            var geom = (<THREE.Mesh>this.obj_loader.parse(data).children[0]).geometry;
+            var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+            material.transparent = true;
+            model = new THREE.Mesh(geom, material);
+            this._add_obj(model, label);
+        }
+        this._set_position_orientation_if_provided(model, position, orientation);
+        var mat = <THREE.MeshBasicMaterial>model.material;
+
+        if (texture_uri) {
+            mat.map = new THREE.TextureLoader().load(texture_uri);
+        }
+        // mat.opacity = opacity;
+        // plane.scale.set(scale_x, scale_y, 1.0);
     }
 
     add_plane(label: string, position: Position | null, orientation: Orientation | null, color: string = "#ff0000", scale_x: number = 1.0, scale_y: number = 1.0, opacity: number = 1.0) {

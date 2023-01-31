@@ -172,7 +172,7 @@ class CommandSender:
         cmd["type"] = "plane"
         cmd["scale_x"] = scale[0]
         cmd["scale_y"] = scale[1]
-        cmd["color"] = "color"
+        cmd["color"] = color
         self.send(cmd)
         return cmd
 
@@ -199,6 +199,14 @@ class CommandSender:
         cmd["color"] = color
         cmd["height"] = height
         cmd["opacity"] = opacity
+        self.send(cmd)
+        return cmd
+
+    def plot_obj(self, pose, label, data, texture=None):
+        cmd = transform_to_cmd(pose, label, 1.0)
+        cmd.update({"data": data, "type": "obj"})
+        if texture is not None:
+            cmd["uri"] = image_to_uri(texture)
         self.send(cmd)
         return cmd
 
