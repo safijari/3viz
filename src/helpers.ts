@@ -302,6 +302,7 @@ export class ThreeViz {
         var mat = <THREE.MeshBasicMaterial>model.material;
 
         if (texture_uri) {
+            console.log(texture_uri);
             mat.map = new THREE.TextureLoader().load(texture_uri);
         }
         // mat.opacity = opacity;

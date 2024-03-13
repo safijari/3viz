@@ -71,6 +71,7 @@ function startWebsocket() {
     }
 
     ws.onmessage = function(ev) {
+        console.log(ev);
         ev.data.arrayBuffer().then(
             function(val: any) {
                 let data: any = decode(val);

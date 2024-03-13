@@ -75,13 +75,15 @@ class CommandSender:
         self.clients_lock = Lock()
         self.clients = []
         self.debug = debug
+        self.noserver = os.environ.get("THREEVIZ_NO_SERVER", False)
         self.queue = Queue()
         self.loop = None
         self.should_wait = wait
 
         self.thread = Thread(target=self._main)
         self.thread.daemon = True
-        self.thread.start()
+        if not self.noserver:
+            self.thread.start()
         self.queue.get()
         self.recording = []
         self.do_recording = False
@@ -124,29 +126,32 @@ class CommandSender:
     def send(self, cmd):
         if self.do_recording:
             self.recording.append(json.loads(json.dumps(cmd)))
-        if self.should_wait:
+
+        if self.should_wait and not self.noserver:
             while True:
                 if len(self.clients) > 0:
                     break
                 time.sleep(0.2)
 
-        with self.clients_lock:
-            for client in self.clients:
-                client.write_message(
-                    msgpack.packb(cmd, use_bin_type=False), binary=True
-                )
+        if not self.noserver:
+            with self.clients_lock:
+                for client in self.clients:
+                    client.write_message(
+                        msgpack.packb(cmd, use_bin_type=False), binary=True
+                    )
 
     def shutdown(self):
         self.server.stop()
 
     def __del__(self):
-        self.shutdown()
-        time.sleep(0.1)
+        if not self.noserver:
+            self.shutdown()
+            time.sleep(0.1)
 
-        try:
-            self.loop.stop()
-        except Exception:
-            traceback.print_exc()
+            try:
+                self.loop.stop()
+            except Exception:
+                traceback.print_exc()
 
     def _delete(self):
         self.__del__()
