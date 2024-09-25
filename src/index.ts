@@ -42,6 +42,8 @@ function process_cmd(data: any) {
         }
     } else if (data.type == "pointcloud") {
         scn.add_pointcloud(data.label, data.position, data.orientation, data.arrs, data.color, data.opacity, data.size);
+    } else if (data.type == "pointcloud_with_per_point_color") {
+        scn.add_pointcloud_with_per_point_color(data.label, data.position, data.orientation, data.arrs, data.color_arrs, data.opacity, data.size);
     } else if (data.type == "cubecloud") {
         scn.add_cube_cloud(data.label, data.position, data.orientation, data.color, data.xarr, data.yarr, data.zarr, data.opacity, data.size);
     } else if (data.type == "line") {

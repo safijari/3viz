@@ -109,7 +109,7 @@ export class ThreeViz {
         this.add_axes('root', null, null, 0.2)
 
         this.gui.add(this.settings, "status");
-        this.gui.add(this.settings, "fov", 50, 100).onChange((v) => { this.camera.fov = v; this.camera.updateProjectionMatrix(); });
+        this.gui.add(this.settings, "fov", 1, 150).onChange((v) => { this.camera.fov = v; this.camera.updateProjectionMatrix(); });
         this.gui.add(this.settings, "default_cam");
         this.gui.add(this.settings, "clear_all");
         let that = this;
@@ -371,6 +371,34 @@ export class ThreeViz {
         mat.color.set(color);
         mat.opacity = opacity;
         console.log(opacity)
+    }
+
+
+    add_pointcloud_with_per_point_color(label: string, position: Position | null, orientation: Orientation | null, point_arrays: number[], color_arrays: number[], opacity: number = 1.0, point_size: number = 0.1) {
+        let obj: THREE.Points;
+
+        if (label in this.objects) {
+            obj = <THREE.Points>this.objects[label]
+            let geom = (<THREE.BufferGeometry>obj.geometry);
+            this.scene.remove(obj);
+            geom.dispose();
+        }
+
+        let mat = new THREE.PointsMaterial({
+            size: point_size, vertexColors: true,
+            transparent: true, opacity: opacity
+        })
+        let geom = new THREE.BufferGeometry()
+        geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(point_arrays), 3))
+        geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(color_arrays), 3));
+
+        obj = new THREE.Points(geom, mat)
+
+        this._add_obj(obj, label)
+
+        mat.opacity = opacity
+
+        this._set_position_orientation_if_provided(obj, position, orientation)
     }
 
     add_pointcloud(label: string, position: Position | null, orientation: Orientation | null, point_arrays: number[], color: string = "#ff0000", opacity: number = 1.0, point_size: number = 0.1) {
