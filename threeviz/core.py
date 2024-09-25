@@ -14,6 +14,7 @@ import json
 
 from threeviz.helpers import (
     pointcloud_cmd,
+    pointcloud_with_color_cmd,
     transform_to_cmd,
     points_to_line_cmd,
     image_to_uri,
@@ -151,7 +152,7 @@ class CommandSender:
     def _delete(self):
         self.__del__()
 
-    def plot_3d(self, x, y, z, label, color="red", opacity=0.5, size=0.1):
+    def plot_3d(self, x, y, z, label, color="red", opacity=0.5, size=0.05):
         try:
             _ = len(x)
         except TypeError:
@@ -159,6 +160,11 @@ class CommandSender:
             y = [y]
             z = [z]
         cmd = pointcloud_cmd(x, y, z, label, color, opacity, size)
+        self.send(cmd)
+        return cmd
+
+    def plot_3d_with_color(self, x, y, z, r, g, b, label, opacity=1, size=0.05):
+        cmd = pointcloud_with_color_cmd(x, y, z, r, g, b, label, opacity, size)
         self.send(cmd)
         return cmd
 

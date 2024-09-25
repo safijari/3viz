@@ -81,13 +81,24 @@ def scan_to_cmd(i, label):
     }
 
 
-def pointcloud_cmd(x, y, z, label, color="red", opacity=0.5, size=0.1):
+def pointcloud_cmd(x, y, z, label, color="red", opacity=0.5, size=0.05):
     return {
         "type": "pointcloud",
         "label": str(label),
         "arrs": np.vstack((x, y, z)).T.flatten().tolist(),
         "opacity": opacity,
         "color": color,
+        "size": size,
+    }
+
+
+def pointcloud_with_color_cmd(x, y, z, r, g, b, label, opacity=1, size=0.05):
+    return {
+        "type": "pointcloud_with_per_point_color",
+        "label": str(label),
+        "arrs": np.vstack((x, y, z)).T.flatten().tolist(),
+        "color_arrs": np.vstack((r, g, b)).T.flatten().tolist(),
+        "opacity": opacity,
         "size": size,
     }
 

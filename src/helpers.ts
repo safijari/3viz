@@ -106,7 +106,7 @@ export class ThreeViz {
         this.add_axes('root', null, null, 0.2)
 
         this.gui.add(this.settings, "status");
-        this.gui.add(this.settings, "fov", 50, 100).onChange((v) => { this.camera.fov = v; this.camera.updateProjectionMatrix(); });
+        this.gui.add(this.settings, "fov", 1, 150).onChange((v) => { this.camera.fov = v; this.camera.updateProjectionMatrix(); });
         this.gui.add(this.settings, "default_cam");
         this.gui.add(this.settings, "clear_all");
         let that = this;

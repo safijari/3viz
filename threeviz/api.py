@@ -11,6 +11,7 @@ import os
 
 sender = CommandSender(int(os.environ.get("THREEVIZ_PORT", 8765)))
 plot_3d = sender.plot_3d
+plot_3d_with_color = sender.plot_3d_with_color
 plot_pose = sender.plot_pose
 plot_plane = sender.plot_plane
 plot_cylinder = sender.plot_cylinder
